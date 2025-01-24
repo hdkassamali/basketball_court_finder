@@ -1,4 +1,47 @@
-{% extends "base.html" %}
+{% extends "base.html" %} {% block title %}Where You Hooping?{% endblock %} {%
+block content %}
+<div class="container text-center my-5">
+  <h1 class="display-4 text-white font-weight-bold bg-custom-primary py-2 px-4 mb-4 rounded-3 shadow d-inline-block">
+    Where You Hooping?
+  </h1>
+  <h4 class="text-custom-secondary">
+    <strong
+      >Find and save your favorite basketball courts in a quick and convenient
+      way. So you can get back to doing what you love the most... Let's
+      hoop!</strong
+    >
+  </h4>
+</div>
 
-{% block title %}Where You Hooping?{% endblock %}
-{% block content %} {% endblock %}
+<div class="container text-center my-5">
+  <img
+    class="map_image rounded shadow"
+    src="{{ url_for('static', filename='images/basketball_court_finder_example.png') }}"
+    alt="Google Maps Basketball Court Finder"
+    style="max-width: 100%; height: auto"
+  />
+</div>
+
+<div class="container">
+  <div class="card shadow-lg my-4 bg-custom-secondary border-0">
+    <div class="card-body">
+      <h5 class="card-title text-center">
+        <a href="/register" class="text-light homepage_link">
+          <strong>Sign up today to start searching!</strong>
+        </a>
+      </h5>
+    </div>
+  </div>
+
+  <div class="card shadow-lg my-4 bg-custom-accent border-0">
+    <div class="card-body">
+      <h5 class="card-title text-center">
+        <a class="text-light homepage_link" href="/login">
+          <strong>Login to view your saved courts!</strong>
+        </a>
+      </h5>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

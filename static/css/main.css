@@ -1,0 +1,30 @@
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+.map_image {
+    width: 70%;
+    height: 70%;
+}
+
+a:hover {
+    color: #FF6500;
+    text-decoration: none;
+}
+
+.homepage_link {
+    text-decoration: none;
+}
+
+.homepage_link:hover {
+    text-decoration: underline;
+    
+}
+
+
+h1 {
+  text-align: center;
+  font-size: 3rem; /* Adjust size as needed */
+  font-weight: bold;
+  letter-spacing: 1px;
+}

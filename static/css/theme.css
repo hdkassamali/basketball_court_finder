@@ -1,0 +1,38 @@
+:root {
+  --bs-custom-primary: #FF6500; /* Orange */
+  --bs-custom-secondary: #1E3E62; /* Dark Blue */
+  --bs-custom-accent: #0B192C; /* Very Dark Blue */
+  --bs-custom-neutral: #000000; /* Black */
+}
+
+.bg-custom-primary {
+  background-color: var(--bs-custom-primary) !important;
+}
+
+.text-custom-primary {
+  color: var(--bs-custom-primary) !important;
+}
+
+.bg-custom-secondary {
+  background-color: var(--bs-custom-secondary) !important;
+}
+
+.text-custom-secondary {
+  color: var(--bs-custom-secondary) !important;
+}
+
+.bg-custom-accent {
+  background-color: var(--bs-custom-accent) !important;
+}
+
+.text-custom-accent {
+  color: var(--bs-custom-accent) !important;
+}
+
+.bg-custom-neutral {
+  background-color: var(--bs-custom-neutral) !important;
+}
+
+.text-custom-neutral {
+  color: var(--bs-custom-neutral) !important;
+}

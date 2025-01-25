@@ -1,7 +1,9 @@
 {% extends "base.html" %} {% block title %}Where You Hooping?{% endblock %} {%
 block content %}
 <div class="container text-center my-5">
-  <h1 class="display-4 text-white font-weight-bold bg-custom-primary py-2 px-4 mb-4 rounded-3 shadow d-inline-block">
+  <h1
+    class="display-4 text-white font-weight-bold bg-custom-primary py-2 px-4 mb-4 rounded-3 shadow d-inline-block"
+  >
     Where You Hooping?
   </h1>
   <h4 class="text-custom-secondary">
@@ -22,24 +24,29 @@ block content %}
   />
 </div>
 
-<div class="container">
-  <div class="card shadow-lg my-4 bg-custom-secondary border-0">
-    <div class="card-body">
-      <h5 class="card-title text-center">
-        <a href="/register" class="text-light homepage_link">
-          <strong>Sign up today to start searching!</strong>
-        </a>
-      </h5>
+<div class="container mb-5">
+  <div class="row justify-content-center g-4">
+    <div class="col-md-5">
+      <div class="card shadow-lg bg-custom-secondary border-0 rounded-4 homepage_card">
+        <div class="card-body text-center">
+          <h5 class="card-title">
+            <a href="/register" class="text-light homepage_link">
+              <strong>Sign up today to start searching!</strong>
+            </a>
+          </h5>
+        </div>
+      </div>
     </div>
-  </div>
-
-  <div class="card shadow-lg my-4 bg-custom-accent border-0">
-    <div class="card-body">
-      <h5 class="card-title text-center">
-        <a class="text-light homepage_link" href="/login">
-          <strong>Login to view your saved courts!</strong>
-        </a>
-      </h5>
+    <div class="col-md-5">
+      <div class="card shadow-lg bg-custom-accent border-0 rounded-4 homepage_card">
+        <div class="card-body text-center">
+          <h5 class="card-title">
+            <a class="text-light homepage_link" href="/login">
+              <strong>Login to view your saved courts!</strong>
+            </a>
+          </h5>
+        </div>
+      </div>
     </div>
   </div>
 </div>

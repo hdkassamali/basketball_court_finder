@@ -22,11 +22,39 @@ class User(db.Model):
 
     last_name = db.Column(db.String(length=30), nullable=False)
 
-    bio = db.Column(db.Text, nullable=True)
+    bio = db.Column(db.Text, nullable=True, default="")
 
-    location = db.Column(db.Text, nullable=True)
+    location = db.Column(db.Text, nullable=True, default="")
 
     courts = db.relationship("Court", backref="user", cascade="all, delete-orphan")
+
+    @classmethod
+    def register(cls, username, password, email, first_name, last_name, bio, location):
+        """Register a user with a hashed password."""
+
+        hashed = bcrypt.generate_password_hash(password)
+
+        hashed_utf8 = hashed.decode("utf8")
+
+        return cls(
+            username=username,
+            password=hashed_utf8,
+            email=email,
+            first_name=first_name,
+            last_name=last_name,
+            bio=bio,
+            location=location,
+        )
+    
+    @classmethod
+    def authenticate(cls, username, password):
+        """Login a user checking for password hash to match database."""
+
+        user = User.query.filter_by(username=username).first()
+        if user and bcrypt.check_password_hash(user.password, password):
+            return user
+        else:
+            return False
 
 
 class Court(db.Model):
@@ -46,7 +74,12 @@ class Court(db.Model):
 
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
 
-    user_rating = db.Column(db.Float, db.CheckConstraint('user_rating >= 0 AND user_rating <= 5'), nullable=True)
+    user_rating = db.Column(
+        db.Float,
+        db.CheckConstraint("user_rating >= 0 AND user_rating <= 5"),
+        nullable=True,
+        default=None,
+    )
 
 
 # When working in ipython, running seed file, or when using unittest framework use this connect_db function otherwise use the one below:

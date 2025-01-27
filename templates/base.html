@@ -48,7 +48,7 @@
         <a href="/" class="navbar-brand text-light navbar_title">The Court Connect</a>
         {# {% endif %} #}
         <ul class="navbar-nav ml-auto">
-          {% if session['username'] %}
+          {% if g.user %}
           <li class="nav-item">
             <a class="nav-link me-3 text-light" href="/logout">Logout</a>
           </li>

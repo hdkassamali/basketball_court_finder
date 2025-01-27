@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, flash, request, session
+from flask import Flask, render_template, redirect, flash, request, session, g
 from flask_debugtoolbar import DebugToolbarExtension
 from models import connect_db, User, Court, db
 from forms import RegisterForm, LoginForm
@@ -19,8 +19,30 @@ toolbar = DebugToolbarExtension(app)
 
 connect_db(app)
 
+CURR_USER_KEY = "curr_user"
 
 ######## HELPER FUNCTIONS #######
+
+
+@app.before_request
+def add_user_to_g():
+    """If a user is logged in, add curr user to Flask global."""
+
+    if CURR_USER_KEY in session:
+        g.user = User.query.get(session[CURR_USER_KEY])
+    else:
+        g.user = None
+
+
+def do_login(user):
+    """Log in a user."""
+    session[CURR_USER_KEY] = user.id
+
+
+def do_logout():
+    """Logout user."""
+    if CURR_USER_KEY in session:
+        del session[CURR_USER_KEY]
 
 
 def login_required(f):
@@ -28,7 +50,7 @@ def login_required(f):
 
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if "username" not in session:
+        if not g.user:
             flash("Please login first!", "danger")
             return redirect("/login")
         return f(*args, **kwargs)
@@ -36,17 +58,19 @@ def login_required(f):
     return decorated_function
 
 
-def check_user_authorized(username):
+def check_user_authorized():
     """Redirects the user to their own page if they attempt to access another user's page."""
 
-    if session.get("username") != username:
+    if not g.user or g.user.id != session[CURR_USER_KEY]:
         flash("You are not authorized to access this page", "danger")
-        return redirect(f"users/{session['username']}")
+        return redirect(f"users/{g.user.username}")
     return None
 
 
 def handle_update_user_profile_form(user, form):
     """Updates user profile with form data and commits changes to the database. Redirect response to the user's page after updating profile."""
+
+    ### TODO ###
 
 
 ####### ROUTES #######
@@ -54,7 +78,7 @@ def handle_update_user_profile_form(user, form):
 
 @app.route("/")
 def home():
-    """Home Page"""
+    """Home Page when no user is logged in."""
     return render_template("homepage.html")
 
 
@@ -64,30 +88,31 @@ def home():
 @app.route("/register", methods=["GET", "POST"])
 def register():
     """
-    Handles user registration.
+    Handles user registration. Creates a new user and adds to DB. Redirects to their user page.
 
     GET: Displays the registration form.
     POST: Validates and processes registration data, then creates a new user.
     """
 
     form = RegisterForm()
-    if form.validate_on_submit():
-        username = form.username.data
-        password = form.password.data
-        email = form.email.data
-        first_name = form.first_name.data
-        last_name = form.last_name.data
-        bio = form.bio.data
-        location = form.location.data
-        new_user = User.register(
-            username, password, email, first_name, last_name, bio, location
-        )
 
-        db.session.add(new_user)
+    if form.validate_on_submit():
         try:
+            new_user = User.register(
+                username=form.username.data,
+                password=form.password.data,
+                email=form.email.data,
+                first_name=form.first_name.data,
+                last_name=form.last_name.data,
+                bio=form.bio.data,
+                location=form.location.data,
+            )
+            db.session.add(new_user)
             db.session.commit()
+
         except IntegrityError as e:
             db.session.rollback()
+            app.logger.error(f"IntegrityError: {e}")
             if "username" in str(e.orig):
                 form.username.errors.append(
                     "Sorry! Another fellow hooper has already claimed that username. Please choose another username!"
@@ -100,10 +125,10 @@ def register():
                 flash("An unexpected error occured. Please try again", "danger")
             return render_template("register.html", form=form)
 
-        session["username"] = new_user.username
+        do_login(new_user)
 
         flash(
-            f"Hey {new_user.username}! Welcome to Where You Hooping? Start finding courts near you!",
+            f"Hey {new_user.username}! Welcome to The Court Connect. Start finding courts near you!",
             "success",
         )
         return redirect(f"/users/{new_user.username}")
@@ -122,16 +147,24 @@ def login():
 
     form = LoginForm()
     if form.validate_on_submit():
-        username = form.username.data
-        password = form.password.data
-
-        user = User.authenticate(username, password)
+        user = User.authenticate(
+            username=form.username.data, password=form.password.data
+        )
 
         if user:
             flash(f"Welcome back, {user.username}!", "success")
-            session["username"] = user.username
+            do_login(user)
             return redirect(f"/users/{user.username}")
         else:
             form.username.errors = ["Invalid username/password"]
 
     return render_template("login.html", form=form)
+
+
+@app.route("/logout")
+def logout():
+    """Handle logout of user."""
+
+    do_logout()
+    flash("Successfully logged out. See ya at the next hoop sesh ✊", "success")
+    return redirect("/login")

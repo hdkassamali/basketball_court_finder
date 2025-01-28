@@ -26,6 +26,7 @@ block content %}
 
 <div class="container mb-5">
   <div class="row justify-content-center g-4">
+  {% if not g.user %}
     <div class="col-md-5">
       <div class="card shadow-lg bg-custom-secondary border-0 rounded-4 homepage_card">
         <div class="card-body text-center">
@@ -48,6 +49,30 @@ block content %}
         </div>
       </div>
     </div>
+    {% else %}
+    <div class="col-md-5">
+      <div class="card shadow-lg bg-custom-secondary border-0 rounded-4 homepage_card">
+        <div class="card-body text-center">
+          <h5 class="card-title">
+            <a href="/search" class="text-light homepage_link">
+              <strong>Search for basketball courts!</strong>
+            </a>
+          </h5>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-5">
+      <div class="card shadow-lg bg-custom-accent border-0 rounded-4 homepage_card">
+        <div class="card-body text-center">
+          <h5 class="card-title">
+            <a class="text-light homepage_link" href="/users/{{g.user.username}}/saved_courts">
+              <strong>View your saved courts!</strong>
+            </a>
+          </h5>
+        </div>
+      </div>
+    </div>
+    {% endif %}
   </div>
 </div>
 

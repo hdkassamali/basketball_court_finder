@@ -58,13 +58,12 @@ def login_required(f):
     return decorated_function
 
 
-def check_user_authorized():
+def check_user_authorized(username):
     """Redirects the user to their own profile page if they attempt to access another user's profile page."""
 
-    if not g.user or g.user.id != session[CURR_USER_KEY]:
+    if username != g.user.username:
         flash("You are not authorized to access this page", "danger")
         return redirect(f"users/{g.user.username}/user_profile")
-    return None
 
 
 def handle_update_user_profile_form(user, form):
@@ -162,6 +161,7 @@ def login():
 
 
 @app.route("/logout")
+@login_required
 def logout():
     """Handle logout of user."""
 
@@ -178,7 +178,7 @@ def logout():
 def show_user_profile(username):
     """When a user is logged in, show the user's profile information."""
 
-    check_user_authorized()
+    check_user_authorized(username)
 
     return render_template("user_profile_page.html", user=g.user)
 

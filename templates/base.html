@@ -42,15 +42,14 @@
   <body class="bg-light text-custom-primary">
     <nav class="navbar navbar-expand-lg navbar-light bg-custom-accent">
       <div class="container">
-        {# {% if session["username"] %}
-        <a class="navbar-brand text-light">Where You Hooping?</a>
-        {% else %} #}
         <a href="/" class="navbar-brand text-light navbar_title">The Court Connect</a>
-        {# {% endif %} #}
         <ul class="navbar-nav ml-auto">
           {% if g.user %}
           <li class="nav-item">
             <a class="nav-link me-3 text-light" href="/logout">Logout</a>
+          </li>
+          <li class="nav-item">
+          <a class="nav-link me-3 text-light" href="/users/{{g.user.username}}/user_profile"><i class="fa-solid fa-user-large"></i></a>
           </li>
           {% else %}
           <li class="nav-item">

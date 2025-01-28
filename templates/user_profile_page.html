@@ -1,0 +1,44 @@
+{% extends "base.html" %} {% block title %}{{user.username}}'s Profile{%
+endblock %} {% block content %}
+<div class="container mt-4 mb-4">
+  <div class="card border-0 shadow bg-light">
+    <div class="card-body bg-light">
+      <div class="text-center mb-4">
+        <h1 class="text-custom-accent">{{user.username}}</h1>
+        <p class="text-custom-neutral">User Profile</p>
+      </div>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item">
+          <span class="fw-bold text-custom-primary">Username:</span>
+          {{user.username}}
+        </li>
+        <li class="list-group-item">
+          <span class="fw-bold text-custom-primary">Email Address:</span>
+          {{user.email}}
+        </li>
+        <li class="list-group-item">
+          <span class="fw-bold text-custom-primary">First Name:</span>
+          {{user.first_name}}
+        </li>
+        <li class="list-group-item">
+          <span class="fw-bold text-custom-primary">Last Name:</span>
+          {{user.last_name}}
+        </li>
+        <li class="list-group-item">
+          <span class="fw-bold text-custom-primary">Bio:</span> {{user.bio}}
+        </li>
+        <li class="list-group-item">
+          <span class="fw-bold text-custom-primary">Location:</span>
+          {{user.location}}
+        </li>
+      </ul>
+      <div class="text-center mt-4">
+        <a href="/users/{{user.username}}/edit_profile" id="edit_user_details_btn" class="btn bg-custom-primary text-light fw-bold px-4 py-2">
+          Edit User Details
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

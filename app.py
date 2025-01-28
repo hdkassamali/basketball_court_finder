@@ -59,11 +59,11 @@ def login_required(f):
 
 
 def check_user_authorized():
-    """Redirects the user to their own page if they attempt to access another user's page."""
+    """Redirects the user to their own profile page if they attempt to access another user's profile page."""
 
     if not g.user or g.user.id != session[CURR_USER_KEY]:
         flash("You are not authorized to access this page", "danger")
-        return redirect(f"users/{g.user.username}")
+        return redirect(f"users/{g.user.username}/user_profile")
     return None
 
 
@@ -131,7 +131,7 @@ def register():
             f"Hey {new_user.username}! Welcome to The Court Connect. Start finding courts near you!",
             "success",
         )
-        return redirect(f"/users/{new_user.username}")
+        return redirect(f"/users/{new_user.username}/user_profile")
 
     return render_template("register.html", form=form)
 
@@ -154,7 +154,7 @@ def login():
         if user:
             flash(f"Welcome back, {user.username}!", "success")
             do_login(user)
-            return redirect(f"/users/{user.username}")
+            return redirect(f"/users/{user.username}/user_profile")
         else:
             form.username.errors = ["Invalid username/password"]
 
@@ -168,3 +168,28 @@ def logout():
     do_logout()
     flash("Successfully logged out. See ya at the next hoop sesh ✊", "success")
     return redirect("/login")
+
+
+### USER PROFILE ROUTES ###
+
+
+@app.route("/users/<username>/user_profile")
+@login_required
+def show_user_profile(username):
+    """When a user is logged in, show the user's profile information."""
+
+    check_user_authorized()
+
+    return render_template("user_profile_page.html", user=g.user)
+
+@app.route("/users/<username>/edit_profile", methods=["GET", "POST"])
+@login_required
+def edit_user_profile(username):
+    """
+    Edit a user's proflle.
+
+    GET: Pre-fills the Register form with existing user data.
+    POST: Validates and updates the edited user data in the database.
+    """
+    #TODO
+

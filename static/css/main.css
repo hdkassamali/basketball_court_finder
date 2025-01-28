@@ -2,14 +2,16 @@ body {
   font-family: "Inter", sans-serif;
 }
 
+h1 {
+  text-align: center;
+  font-size: 3rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
 .map_image {
   width: 70%;
   height: 70%;
-}
-
-a:hover {
-  color: #ff6500;
-  text-decoration: none;
 }
 
 .navbar_title {
@@ -34,14 +36,15 @@ a:hover {
   text-decoration: underline;
 }
 
-h1 {
-  text-align: center;
-  font-size: 3rem;
-  font-weight: bold;
-  letter-spacing: 1px;
-}
-
 .homepage_card {
   max-width: 50%;
   margin: auto;
+}
+
+#edit_user_details_btn:hover {
+  background-color: #ff4e00;
+}
+
+#submit_btn:hover {
+  background-color: #1a2e44;
 }

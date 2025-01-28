@@ -6,33 +6,33 @@
 }
 
 .bg-custom-primary {
-  background-color: var(--bs-custom-primary) !important;
+  background-color: var(--bs-custom-primary);
 }
 
 .text-custom-primary {
-  color: var(--bs-custom-primary) !important;
+  color: var(--bs-custom-primary);
 }
 
 .bg-custom-secondary {
-  background-color: var(--bs-custom-secondary) !important;
+  background-color: var(--bs-custom-secondary);
 }
 
 .text-custom-secondary {
-  color: var(--bs-custom-secondary) !important;
+  color: var(--bs-custom-secondary);
 }
 
 .bg-custom-accent {
-  background-color: var(--bs-custom-accent) !important;
+  background-color: var(--bs-custom-accent);
 }
 
 .text-custom-accent {
-  color: var(--bs-custom-accent) !important;
+  color: var(--bs-custom-accent);
 }
 
 .bg-custom-neutral {
-  background-color: var(--bs-custom-neutral) !important;
+  background-color: var(--bs-custom-neutral);
 }
 
 .text-custom-neutral {
-  color: var(--bs-custom-neutral) !important;
+  color: var(--bs-custom-neutral);
 }

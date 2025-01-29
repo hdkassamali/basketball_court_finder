@@ -1,7 +1,7 @@
 from flask import Flask, render_template, redirect, flash, request, session, g
 from flask_debugtoolbar import DebugToolbarExtension
 from models import connect_db, User, Court, db
-from forms import RegisterForm, LoginForm
+from forms import RegisterForm, LoginForm, EditForm
 from functools import wraps
 from sqlalchemy.exc import IntegrityError
 import os
@@ -9,7 +9,7 @@ import os
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql:///basketball_court_finder_db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["SQLALCHEMY_ECHO"] = True
+app.config["SQLALCHEMY_ECHO"] = False
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 app.config["DEBUG_TB_INTERCEPT_REDIRECTS"] = False
 toolbar = DebugToolbarExtension(app)
@@ -58,18 +58,40 @@ def login_required(f):
     return decorated_function
 
 
+def already_logged_in(f):
+    """Decorator to ensure a user is logged in before accesing a route."""
+
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if g.user:
+            flash("You are already logged in", "warning")
+            return redirect(f"/users/{g.user.username}/user_profile")
+        return f(*args, **kwargs)
+
+    return decorated_function
+
+
 def check_user_authorized(username):
     """Redirects the user to their own profile page if they attempt to access another user's profile page."""
 
     if username != g.user.username:
         flash("You are not authorized to access this page", "danger")
-        return redirect(f"users/{g.user.username}/user_profile")
+        return redirect(f"/users/{g.user.username}/user_profile")
+    return None
 
 
 def handle_update_user_profile_form(user, form):
     """Updates user profile with form data and commits changes to the database. Redirect response to the user's page after updating profile."""
 
-    ### TODO ###
+    user.username = form.username.data
+    user.email = form.email.data
+    user.first_name = form.first_name.data
+    user.last_name = form.last_name.data
+    user.bio = form.bio.data
+    user.location = form.location.data
+    db.session.commit()
+    flash(f"You have succesfully updated your profile, {user.username}!", "success")
+    return redirect(f"/users/{user.username}/user_profile")
 
 
 ####### ROUTES #######
@@ -85,6 +107,7 @@ def home():
 
 
 @app.route("/register", methods=["GET", "POST"])
+@already_logged_in
 def register():
     """
     Handles user registration. Creates a new user and adds to DB. Redirects to their user page.
@@ -92,7 +115,7 @@ def register():
     GET: Displays the registration form.
     POST: Validates and processes registration data, then creates a new user.
     """
-
+    
     form = RegisterForm()
 
     if form.validate_on_submit():
@@ -136,6 +159,7 @@ def register():
 
 
 @app.route("/login", methods=["GET", "POST"])
+@already_logged_in
 def login():
     """
     Handles user login.
@@ -178,18 +202,41 @@ def logout():
 def show_user_profile(username):
     """When a user is logged in, show the user's profile information."""
 
-    check_user_authorized(username)
+    unauthorized_redirect = check_user_authorized(username)
+    if unauthorized_redirect:
+        return unauthorized_redirect
 
     return render_template("user_profile_page.html", user=g.user)
+
 
 @app.route("/users/<username>/edit_profile", methods=["GET", "POST"])
 @login_required
 def edit_user_profile(username):
     """
     Edit a user's proflle.
+    Checks if user is unauthorized. E.G. If they are trying to access another profile.
 
     GET: Pre-fills the Register form with existing user data.
     POST: Validates and updates the edited user data in the database.
     """
-    #TODO
 
+    unauthorized_redirect = check_user_authorized(username)
+    if unauthorized_redirect:
+        return unauthorized_redirect
+    
+
+    user = User.query.filter_by(username=username).first()
+    form = EditForm()
+
+    if form.validate_on_submit():
+        return handle_update_user_profile_form(user, form)
+
+    if request.method == "GET":
+        form.username.data = user.username
+        form.email.data = user.email
+        form.first_name.data = user.first_name
+        form.last_name.data = user.last_name
+        form.bio.data = user.bio
+        form.location.data = user.location
+
+    return render_template("edit_user_profile.html", form=form, user=user)

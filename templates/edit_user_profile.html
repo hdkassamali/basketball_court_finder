@@ -1,0 +1,6 @@
+{% extends "form_template.html" %}
+{% block title %}Edit {{user.username}}'s Profile{% endblock %}
+{% block form_title %}Edit {{user.username}}'s Profile{% endblock %}
+{% block form_description %}Edit your profile and save your changes.{% endblock %}
+{% block submit_text %}Save Changes{% endblock%}
+{% block cancel_url %} <a href="/users/{{user.username}}/user_profile" id="sign_up_btn" class="btn btn-secondary">Cancel</a>{% endblock %}

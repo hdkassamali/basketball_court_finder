@@ -18,3 +18,13 @@ class LoginForm(FlaskForm):
 
     username = StringField("Username", validators=[InputRequired()])
     password = PasswordField("Password", validators=[InputRequired()])
+
+class EditForm(FlaskForm):
+    """User edit profile form."""
+
+    username = StringField("Username", validators=[InputRequired("Username cannot be blank"), Length(min=6, max=30)])
+    email = EmailField("Email Address", validators=[InputRequired("Email cannot be blank"), Email(), Length(max=75)])
+    first_name = StringField("First Name", validators=[InputRequired("First Name cannot be blank"), Length(max=30)])
+    last_name = StringField("Last Name", validators=[InputRequired("Last Name cannot be blank"), Length(max=30)])
+    bio = TextAreaField("About Me (Optional)", validators=[Optional()])
+    location = StringField("Location (Optional)", validators=[Optional()])

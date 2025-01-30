@@ -58,8 +58,8 @@ def login_required(f):
     return decorated_function
 
 
-def already_logged_in(f):
-    """Decorator to ensure a user is logged in before accesing a route."""
+def cannot_be_logged_in(f):
+    """Decorator to ensure a logged in user cannot see register/login routes."""
 
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -107,7 +107,7 @@ def home():
 
 
 @app.route("/register", methods=["GET", "POST"])
-@already_logged_in
+@cannot_be_logged_in
 def register():
     """
     Handles user registration. Creates a new user and adds to DB. Redirects to their user page.
@@ -159,7 +159,7 @@ def register():
 
 
 @app.route("/login", methods=["GET", "POST"])
-@already_logged_in
+@cannot_be_logged_in
 def login():
     """
     Handles user login.

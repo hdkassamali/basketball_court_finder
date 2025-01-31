@@ -5,6 +5,7 @@ from forms import RegisterForm, LoginForm, EditForm
 from functools import wraps
 from sqlalchemy.exc import IntegrityError
 import os
+from dotenv import load_dotenv
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql:///basketball_court_finder_db"
@@ -13,6 +14,9 @@ app.config["SQLALCHEMY_ECHO"] = False
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 app.config["DEBUG_TB_INTERCEPT_REDIRECTS"] = False
 toolbar = DebugToolbarExtension(app)
+
+load_dotenv()
+api_key = os.getenv("GOOGLE_MAPS_API_KEY")
 
 # When working in ipython, running seed file, or when using unittest framework run the line below:
 # app.app_context().push()
@@ -240,3 +244,12 @@ def edit_user_profile(username):
         form.location.data = user.location
 
     return render_template("edit_user_profile.html", form=form, user=user)
+
+
+### COURTS ROUTES ###
+
+@app.route("/search")
+@login_required
+def search_for_courts():
+    """If a user is logged in, take them to the page to search for basketball courts. """
+    return render_template("search.html", api_key=api_key)

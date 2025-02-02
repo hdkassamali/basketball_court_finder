@@ -2,13 +2,15 @@
 let map;
 let infoWindow;
 
+
 async function initMap() {
-  // The center of the United States. Zoomed out. 
+  // The center of the United States. Zoomed out.
   const center = { lat: 39.8283, lng: -98.5795 };
-  // Request needed libraries.
+
+  // Request map libraries.
   const { Map, InfoWindow } = await google.maps.importLibrary("maps");
 
-  // The map, centered at Cypress Grove
+  // The map, centered at the center of the US.
   map = new Map(document.getElementById("map"), {
     zoom: 4,
     center,
@@ -19,17 +21,53 @@ async function initMap() {
   // Create an info window to share between markers.
   infoWindow = new InfoWindow();
 
-//   findCourts(infoWindow);
+  initSearchBar();
+};
+
+async function initSearchBar() {
+  // Request search bar libary.
+  const { PlaceAutocompleteElement } = await google.maps.importLibrary("places");
+
+  // Create the place autocomplete search bar.
+  const placeAutocomplete = new PlaceAutocompleteElement();
+  placeAutocomplete.id = "place-autocomplete-input";
+
+  const card = document.createElement("div")
+  card.id = "place-autocomplete-card";
+
+  const searchBarText = document.createElement("p")
+  searchBarText.textContent = "Search for a place here 🏀👇"
+  searchBarText.classList.add("text-center", "text-custom-accent")
+
+  card.appendChild(searchBarText)
+  card.appendChild(placeAutocomplete);
+
+  map.controls[google.maps.ControlPosition.TOP_LEFT].push(card);
+
+  // Generate a new session token.
+  let sessionToken = new google.maps.places.AutocompleteSessionToken();
+
+  // Event listener to handle user search.
+  placeAutocomplete.addEventListener("gmp-placeselect", async ({ place }) => {
+    await place.fetchFields({
+      fields: ["displayName", "formattedAddress", "location"],
+      sessionToken: sessionToken,
+    });
+    findCourts(place);
+
+    // After the place is selected, generate a new session token for the next session.
+    sessionToken = new google.maps.places.AutocompleteSessionToken();
+  });
+
 }
 
-
-
-async function findCourts() {
+async function findCourts(place) {
   // Request needed libraries.
   const { Place } = await google.maps.importLibrary("places");
   const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary(
     "marker"
   );
+
   // Set the request parameters.
   const request = {
     textQuery: "Basketball Court",
@@ -42,7 +80,7 @@ async function findCourts() {
       "rating",
     ],
     includedType: "park",
-    locationBias: { lat: 33.694837, lng: -117.763527 },
+    locationBias: place.location,
     language: "en-US",
     maxResultCount: 100,
     region: "us",

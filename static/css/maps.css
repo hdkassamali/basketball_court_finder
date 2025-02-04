@@ -26,3 +26,24 @@ gmp-place-autocomplete {
 #map #infowindow-content {
   display: inline;
 }
+
+a {
+  cursor: pointer;
+  text-decoration: underline;
+  color: blue;
+}
+
+input {
+  width: 300px;
+}
+
+#search-bar-container {
+  display: flex;
+  justify-content: center;
+}
+
+#search-results {
+  list-style-type: none;
+  text-decoration: underline;
+  text-emphasis: bold;
+}

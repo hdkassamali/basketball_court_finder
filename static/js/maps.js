@@ -1,7 +1,22 @@
 // Initialize and add the map
 let map;
 let infoWindow;
-
+let title;
+let results;
+let input;
+let token;
+let markers = [];
+let request = {
+  input: "",
+  locationRestriction: {
+    west: -122.44,
+    north: 37.8,
+    east: -122.39,
+    south: 37.78,
+  },
+  language: "en-US",
+  region: "us",
+};
 
 async function initMap() {
   // The center of the United States. Zoomed out.
@@ -22,46 +37,86 @@ async function initMap() {
   infoWindow = new InfoWindow();
 
   initSearchBar();
-};
-
-async function initSearchBar() {
-  // Request search bar libary.
-  const { PlaceAutocompleteElement } = await google.maps.importLibrary("places");
-
-  // Create the place autocomplete search bar.
-  const placeAutocomplete = new PlaceAutocompleteElement();
-  placeAutocomplete.id = "place-autocomplete-input";
-
-  const card = document.createElement("div")
-  card.id = "place-autocomplete-card";
-
-  const searchBarText = document.createElement("p")
-  searchBarText.textContent = "Search for a place here 🏀👇"
-  searchBarText.classList.add("text-center", "text-custom-accent")
-
-  card.appendChild(searchBarText)
-  card.appendChild(placeAutocomplete);
-
-  map.controls[google.maps.ControlPosition.TOP_LEFT].push(card);
-
-  // Generate a new session token.
-  let sessionToken = new google.maps.places.AutocompleteSessionToken();
-
-  // Event listener to handle user search.
-  placeAutocomplete.addEventListener("gmp-placeselect", async ({ place }) => {
-    await place.fetchFields({
-      fields: ["displayName", "formattedAddress", "location"],
-      sessionToken: sessionToken,
-    });
-    findCourts(place);
-
-    // After the place is selected, generate a new session token for the next session.
-    sessionToken = new google.maps.places.AutocompleteSessionToken();
-  });
-
 }
 
-async function findCourts(place) {
+async function initSearchBar() {
+  const { Place } = await google.maps.importLibrary("places");
+  token = new google.maps.places.AutocompleteSessionToken();
+  title = document.getElementById("search-title");
+  results = document.getElementById("search-results");
+  input = document.querySelector("input");
+  input.addEventListener("input", makeAcRequest);
+  request = refreshToken(request);
+}
+
+async function makeAcRequest(input) {
+  if (input.target.value == "") {
+    title.innerText = "";
+    results.replaceChildren();
+    return;
+  }
+  request.input = input.target.value;
+
+  const { suggestions } =
+    await google.maps.places.AutocompleteSuggestion.fetchAutocompleteSuggestions(
+      request
+    );
+  title.innerText = 'Predictions for "' + request.input + '"';
+  results.replaceChildren();
+
+  for (const suggestion of suggestions) {
+    const placePrediction = suggestion.placePrediction;
+    const a = document.createElement("a");
+
+    a.addEventListener("click", () => {
+        onPlaceSelected(placePrediction.toPlace());
+    });
+    a.innerText = placePrediction.text.toString();
+
+    const li = document.createElement("li");
+    li.appendChild(a);
+    results.appendChild(li);
+  }
+}
+
+async function onPlaceSelected(searchPlace) {
+    await searchPlace.fetchFields({
+        fields: ["displayName", "formattedAddress", "location"],
+        sessionToken: token,
+    });
+    let searchText = document.createTextNode(
+        searchPlace.displayName + ": " + searchPlace.formattedAddress + ". " + searchPlace.location,
+    );
+    results.replaceChildren(searchText);
+    title.innerText = "Selected Place:";
+    findCourts(searchPlace)
+    input.value = "";
+    refreshToken(request);
+}
+
+async function refreshToken(request) {
+  token = new google.maps.places.AutocompleteSessionToken();
+  request.sessionToken = token;
+  return request;
+}
+
+function clearMarkers() {
+    markers.forEach(marker => {
+        try {
+            marker.map = null;
+            if (marker.setMap) marker.setMap(null);
+            if (marker.unbindAll) marker.unbindAll();
+        } catch (e) {
+            console.warn("Error removing marker:", e);
+        }
+    });
+    markers = [];
+}
+
+async function findCourts(searchPlace) {
+  // Empty markers from previous search;
+    clearMarkers();
+
   // Request needed libraries.
   const { Place } = await google.maps.importLibrary("places");
   const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary(
@@ -69,7 +124,7 @@ async function findCourts(place) {
   );
 
   // Set the request parameters.
-  const request = {
+  const requestCourts = {
     textQuery: "Basketball Court",
     fields: [
       "displayName",
@@ -80,14 +135,14 @@ async function findCourts(place) {
       "rating",
     ],
     includedType: "park",
-    locationBias: place.location,
+    locationBias: searchPlace.location,
     language: "en-US",
     maxResultCount: 100,
     region: "us",
     useStrictTypeFiltering: false,
   };
 
-  const { places } = await Place.searchByText(request);
+  const { places } = await Place.searchByText(requestCourts);
 
   if (places.length) {
     console.log(places);
@@ -122,6 +177,7 @@ async function findCourts(place) {
         infoWindow.setContent(marker.title);
         infoWindow.open(marker.map, marker);
       });
+      markers.push(marker);
     });
     map.fitBounds(bounds);
   } else {

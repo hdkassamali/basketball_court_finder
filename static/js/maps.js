@@ -28,6 +28,8 @@ async function initSearchBar() {
   const { Geocoder } = await google.maps.importLibrary("geocoding");
   const input = document.getElementById("search-bar-input");
   const button = document.getElementById("search-bar-btn");
+  const searchArea = document.getElementById("search-area");
+  const resulting_address = document.createElement("p");
 
   button.addEventListener("click", () => {
     const inputValue = input.value.trim();
@@ -36,8 +38,13 @@ async function initSearchBar() {
     const geocoder = new google.maps.Geocoder();
     geocoder.geocode({ address: inputValue }, function (results, status) {
       if (status == "OK") {
+        resulting_address.textContent = ""
+        
         const searchPlace = results[0].geometry.location;
         findCourts(searchPlace);
+
+        resulting_address.textContent = `Showing results near: ${results[0].formatted_address}`;
+        searchArea.append(resulting_address)
       } else if (status == "ZERO_RESULTS") {
         alert(
           "No results for your search. You may have entered an invalid address. Please try again!"

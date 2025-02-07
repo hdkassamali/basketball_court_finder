@@ -14,7 +14,7 @@ async function initMap() {
   map = new Map(document.getElementById("map"), {
     zoom: 4,
     center,
-    mapId: "DEMO_MAP_ID",
+    mapId: "c2c7ec2d8b2c125e",
     mapTypeId: "hybrid",
   });
 
@@ -38,13 +38,13 @@ async function initSearchBar() {
     const geocoder = new google.maps.Geocoder();
     geocoder.geocode({ address: inputValue }, function (results, status) {
       if (status == "OK") {
-        resulting_address.textContent = ""
-        
+        resulting_address.textContent = "";
+
         const searchPlace = results[0].geometry.location;
         findCourts(searchPlace);
 
         resulting_address.textContent = `Showing results near: ${results[0].formatted_address}`;
-        searchArea.append(resulting_address)
+        searchArea.append(resulting_address);
       } else if (status == "ZERO_RESULTS") {
         alert(
           "No results for your search. You may have entered an invalid address. Please try again!"
@@ -95,8 +95,6 @@ async function findCourts(searchPlace) {
   const { places } = await Place.searchByText(requestCourts);
 
   if (places.length) {
-    console.log(places);
-
     const { LatLngBounds } = await google.maps.importLibrary("core");
     const bounds = new LatLngBounds();
 
@@ -123,8 +121,18 @@ async function findCourts(searchPlace) {
       marker.addListener("click", ({ domEvent, latLng }) => {
         const { target } = domEvent;
 
+        const infoWindowContent = `
+        <div class="info-window">
+        <div class="info-window-address">${place.formattedAddress}</div>
+        <a href="${place.googleMapsURI}" target="_blank" class="info-window-maps-link">View on Google Maps</a>
+        </div>
+        `;
         infoWindow.close();
-        infoWindow.setContent(marker.title);
+        const headerDiv = document.createElement("div");
+        headerDiv.classList.add("info-window-header");
+        headerDiv.innerText = place.displayName;
+        infoWindow.setHeaderContent(headerDiv);
+        infoWindow.setContent(infoWindowContent);
         infoWindow.open(marker.map, marker);
       });
       markers.push(marker);

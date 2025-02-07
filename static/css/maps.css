@@ -47,3 +47,35 @@ input {
   text-decoration: underline;
   text-emphasis: bold;
 }
+
+.info-window {
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.info-window-header {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+
+.info-window-address {
+  color: #333;
+  font-size: 14px;
+}
+
+.info-window-maps-link {
+  color: #1a73e8;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.info-window-maps-link:hover {
+  text-decoration: underline;
+}
+
+.gm-style-iw-d {
+  padding-top: 0 !important;
+}

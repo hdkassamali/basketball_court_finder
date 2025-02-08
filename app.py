@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, flash, request, session, g
+from flask import Flask, render_template, redirect, flash, request, session, g, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 from models import connect_db, User, Court, db
 from forms import RegisterForm, LoginForm, EditForm
@@ -119,7 +119,7 @@ def register():
     GET: Displays the registration form.
     POST: Validates and processes registration data, then creates a new user.
     """
-    
+
     form = RegisterForm()
 
     if form.validate_on_submit():
@@ -227,7 +227,6 @@ def edit_user_profile(username):
     unauthorized_redirect = check_user_authorized(username)
     if unauthorized_redirect:
         return unauthorized_redirect
-    
 
     user = User.query.filter_by(username=username).first()
     form = EditForm()
@@ -248,8 +247,37 @@ def edit_user_profile(username):
 
 ### COURTS ROUTES ###
 
+
 @app.route("/search")
 @login_required
 def search_for_courts():
-    """If a user is logged in, take them to the page to search for basketball courts. """
+    """If a user is logged in, take them to the page to search for basketball courts."""
     return render_template("search.html", api_key=api_key)
+
+
+@app.route("/save_court", methods=["POST"])
+@login_required
+def save_court():
+    """Save a court to the database."""
+
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No input data provided"}), 400
+    try: 
+        saved_court = Court(
+            court_name=data.get("court_name"),
+            google_maps_place_id=data.get("google_maps_place_id"),
+            address=data.get("address"),
+            google_maps_url=data.get("google_maps_url"),
+            user_id=g.user.id,
+        )
+        db.session.add(saved_court)
+        db.session.commit()
+        return jsonify({"message": "Court saved successfully!"}), 201
+    except IntegrityError as e:
+        db.session.rollback()
+        app.logger.error(f"IntegrityError: {e}")
+        if "google_maps_place_id" in str(e.orig):
+            return jsonify({"error": "Court already saved"}), 409     
+        else:
+            return jsonify({"error":"An unexpected error occured. Please try again"}), 500

@@ -70,6 +70,26 @@ function clearMarkers() {
   markers = [];
 }
 
+async function saveCourt(court) {
+  const data = {
+    court_name: court.displayName,
+    google_maps_place_id: court.id,
+    address: court.formattedAddress,
+    google_maps_url: court.googleMapsURI
+  };
+
+  try {
+    const response = await axios.post("/save_court", data, {
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+    console.log("Server response:", response.data);
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
+
 async function findCourts(searchPlace) {
   // Empty markers from previous search;
   clearMarkers();
@@ -99,7 +119,7 @@ async function findCourts(searchPlace) {
     const bounds = new LatLngBounds();
 
     // Loop through and get all results, with custom markers.
-    places.forEach((place, i) => {
+    places.forEach((court, i) => {
       // Custom pin, with basketball emoji.
       const pin = new PinElement({
         glyph: "🏀",
@@ -109,28 +129,48 @@ async function findCourts(searchPlace) {
       });
       const marker = new AdvancedMarkerElement({
         map,
-        position: place.location,
-        title: `${i + 1}. ${place.displayName}`,
+        position: court.location,
+        title: `${i + 1}. ${court.displayName}`,
         content: pin.element,
         gmpClickable: true,
       });
 
-      bounds.extend(place.location);
+      bounds.extend(court.location);
 
       // Add a click listener for each marker, and set up the info window.
       marker.addListener("click", ({ domEvent, latLng }) => {
         const { target } = domEvent;
 
-        const infoWindowContent = `
-        <div class="info-window">
-        <div class="info-window-address">${place.formattedAddress}</div>
-        <a href="${place.googleMapsURI}" target="_blank" class="info-window-maps-link">View on Google Maps</a>
-        </div>
-        `;
+        const infoWindowContent = document.createElement("div");
+        infoWindowContent.classList.add("info-window");
+
+        const infoWindowAddress = document.createElement("p");
+        infoWindowAddress.classList.add("info-window-address");
+        infoWindowAddress.textContent = court.formattedAddress;
+
+        const infoWindowMapsLink = document.createElement("a");
+        infoWindowMapsLink.href = court.googleMapsURI;
+        infoWindowMapsLink.target = "_blank";
+        infoWindowMapsLink.textContent = "View on Google Maps";
+        infoWindowMapsLink.classList.add("info-window-maps-link");
+
+        const infoWindowSave = document.createElement("button");
+        infoWindowSave.setAttribute("type", "button");
+        infoWindowSave.ariaLabel = "Save Court"
+        infoWindowSave.classList.add("text-light", "mx-3", "info-window-unsaved")
+        infoWindowSave.innerHTML = "<i class='fa-regular fa-heart'></i>"
+        infoWindowSave.addEventListener("click", (event) => {
+          event.preventDefault();
+          saveCourt(court);
+        })
+
+        infoWindowContent.append(infoWindowAddress, infoWindowMapsLink, infoWindowSave);
         infoWindow.close();
+
         const headerDiv = document.createElement("div");
         headerDiv.classList.add("info-window-header");
-        headerDiv.innerText = place.displayName;
+        headerDiv.innerText = court.displayName;
+
         infoWindow.setHeaderContent(headerDiv);
         infoWindow.setContent(infoWindowContent);
         infoWindow.open(marker.map, marker);

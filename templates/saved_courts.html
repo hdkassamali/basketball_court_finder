@@ -1,13 +1,28 @@
-{% extends "base.html" %} {% block title %}{{user.username}}'s Saved Courts{% endblock %}
-{% block content %} 
-<h1 class="text-center">{{user.username}}'s Saved Courts</h1>
+{% extends "base.html" %}
+{% block head_scripts %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/saved_courts.css') }}">
+{% endblock %}
 
-<ul>
-{% for court in courts %}
-<li>
-<p>{{court.id}}, {{court.court_name}}, {{court.google_maps_place_id}}, {{court.address}}, {{court.google_maps_url}}, {{court.user_id}}, {{court.rating}}</p>
-</li>
-{% endfor %}
-</ul>
+{% block title %}{{user.username}}'s Saved Courts{% endblock %}
 
+{% block content %}
+  <h1 class="text-center my-4">{{ user.username }}'s Saved Courts</h1>
+  <div class="row">
+    {% for court in courts %}
+      <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title">{{ court.court_name }}</h5>
+            <p class="card-text">{{ court.address }}</p>
+            {% if court.rating %}
+              <p class="card-text"><strong>Rating:</strong> {{ court.rating }}</p>
+            {% endif %}
+          </div>
+          <div class="card-footer bg-transparent border-top-0">
+            <a href="{{ court.google_maps_url }}" target="_blank" class="btn bg-custom-primary text-light fw-bold px-4 py-2">View on Google Maps</a>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
 {% endblock %}

@@ -1,0 +1,22 @@
+.card {
+    transition: transform 0.3s ease;
+    border-radius: 10px;
+}
+
+.card:hover {
+    transform: translatey(-5px);
+}
+
+.card-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.card-text {
+    font-size: 1rem;
+}
+
+.bg-custom-primary:hover {
+  background-color: #ff4e00;
+}
+

@@ -204,8 +204,9 @@ def logout():
 @app.route("/users/<username>/user_profile")
 @login_required
 def show_user_profile(username):
-    """When a user is logged in, show the user's profile information. 
-    Checks if user is unauthorized. E.G. If they are trying to access another profile."""
+    """When a user is logged in, show the user's profile information.
+    Checks if user is unauthorized. E.G. If they are trying to access another profile.
+    """
 
     unauthorized_redirect = check_user_authorized(username)
     if unauthorized_redirect:
@@ -263,7 +264,7 @@ def save_court():
     data = request.get_json()
     if not data:
         return jsonify({"error": "No input data provided"}), 400
-    try: 
+    try:
         saved_court = Court(
             court_name=data.get("court_name"),
             google_maps_place_id=data.get("google_maps_place_id"),
@@ -278,13 +279,19 @@ def save_court():
         db.session.rollback()
         app.logger.error(f"IntegrityError: {e}")
         if "google_maps_place_id" in str(e.orig):
-            return jsonify({"error": "Court already saved"}), 409     
+            return jsonify({"error": "Court already saved"}), 409
         else:
-            return jsonify({"error":"An unexpected error occured. Please try again"}), 500
+            return (
+                jsonify({"error": "An unexpected error occured. Please try again"}),
+                500,
+            )
+    except:
+        return jsonify({"error": "An unexpected error occured. Please try again"}), 500
+
 
 @app.route("/users/<username>/saved_courts")
 @login_required
-def view_saved_courts(username): 
+def view_saved_courts(username):
     """Allow a user to view their saved courts.
     Checks if user is unauthorized. E.G. If they are trying to access another user's saved courts.
     """
@@ -294,3 +301,21 @@ def view_saved_courts(username):
         return unauthorized_redirect
 
     return render_template("saved_courts.html", user=g.user, courts=g.user.courts)
+
+
+@app.route("/remove_court", methods=["POST"])
+@login_required
+def remove_saved_court():
+    """Remove's a saved court from the saved_courts page and from the database."""
+
+    data = request.get_json()
+    if not data:
+        return jsonify({"error": "No input data provided"}), 400
+    try:
+        court_id = data.get("court_id")
+        Court.query.filter_by(id=court_id).delete()
+        db.session.commit()
+        return jsonify({"message": "Court successfully deleted"}), 201
+    except:
+        db.session.rollback()
+        return jsonify({"error": "An unexpected error occured. Please try again"}), 500

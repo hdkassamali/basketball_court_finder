@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% block head_scripts %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/saved_courts.css') }}">
+<script type="module" src="{{url_for('static', filename='js/saved_courts.js')}}"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 {% endblock %}
 
 {% block title %}{{user.username}}'s Saved Courts{% endblock %}
@@ -9,7 +11,7 @@
   <h1 class="text-center my-4">{{ user.username }}'s Saved Courts</h1>
   <div class="row">
     {% for court in courts %}
-      <div class="col-md-6 col-lg-4 mb-4">
+      <div class="col-md-6 col-lg-4 mb-4 court-container text-center" data-court-id="{{court.id}}">
         <div class="card h-100 shadow-sm">
           <div class="card-body">
             <h5 class="card-title">{{ court.court_name }}</h5>
@@ -19,7 +21,8 @@
             {% endif %}
           </div>
           <div class="card-footer bg-transparent border-top-0">
-            <a href="{{ court.google_maps_url }}" target="_blank" class="btn bg-custom-primary text-light fw-bold px-4 py-2">View on Google Maps</a>
+            <a href="{{ court.google_maps_url }}" target="_blank" class="btn bg-custom-primary text-light fw-bold px-3 py-2 mx-2">View on Google Maps</a>
+            <button type="button" class="btn btn-danger text-light fw-bold px-3 py-2 remove-court-btn mx-2"><i class="fa-solid fa-trash"></i></button>
           </div>
         </div>
       </div>

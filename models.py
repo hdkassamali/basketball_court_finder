@@ -66,7 +66,7 @@ class Court(db.Model):
 
     court_name = db.Column(db.Text, nullable=False)
 
-    google_maps_place_id = db.Column(db.Text, nullable=False, unique=True)
+    google_maps_place_id = db.Column(db.Text, nullable=False)
 
     address = db.Column(db.Text, nullable=False)
 

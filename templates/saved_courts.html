@@ -1,0 +1,13 @@
+{% extends "base.html" %} {% block title %}{{user.username}}'s Saved Courts{% endblock %}
+{% block content %} 
+<h1 class="text-center">{{user.username}}'s Saved Courts</h1>
+
+<ul>
+{% for court in courts %}
+<li>
+<p>{{court.id}}, {{court.court_name}}, {{court.google_maps_place_id}}, {{court.address}}, {{court.google_maps_url}}, {{court.user_id}}, {{court.rating}}</p>
+</li>
+{% endfor %}
+</ul>
+
+{% endblock %}

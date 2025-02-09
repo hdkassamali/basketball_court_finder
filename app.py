@@ -204,7 +204,8 @@ def logout():
 @app.route("/users/<username>/user_profile")
 @login_required
 def show_user_profile(username):
-    """When a user is logged in, show the user's profile information."""
+    """When a user is logged in, show the user's profile information. 
+    Checks if user is unauthorized. E.G. If they are trying to access another profile."""
 
     unauthorized_redirect = check_user_authorized(username)
     if unauthorized_redirect:
@@ -228,21 +229,20 @@ def edit_user_profile(username):
     if unauthorized_redirect:
         return unauthorized_redirect
 
-    user = User.query.filter_by(username=username).first()
     form = EditForm()
 
     if form.validate_on_submit():
-        return handle_update_user_profile_form(user, form)
+        return handle_update_user_profile_form(g.user, form)
 
     if request.method == "GET":
-        form.username.data = user.username
-        form.email.data = user.email
-        form.first_name.data = user.first_name
-        form.last_name.data = user.last_name
-        form.bio.data = user.bio
-        form.location.data = user.location
+        form.username.data = g.user.username
+        form.email.data = g.user.email
+        form.first_name.data = g.user.first_name
+        form.last_name.data = g.user.last_name
+        form.bio.data = g.user.bio
+        form.location.data = g.user.location
 
-    return render_template("edit_user_profile.html", form=form, user=user)
+    return render_template("edit_user_profile.html", form=form, user=g.user)
 
 
 ### COURTS ROUTES ###
@@ -281,3 +281,16 @@ def save_court():
             return jsonify({"error": "Court already saved"}), 409     
         else:
             return jsonify({"error":"An unexpected error occured. Please try again"}), 500
+
+@app.route("/users/<username>/saved_courts")
+@login_required
+def view_saved_courts(username): 
+    """Allow a user to view their saved courts.
+    Checks if user is unauthorized. E.G. If they are trying to access another user's saved courts.
+    """
+
+    unauthorized_redirect = check_user_authorized(username)
+    if unauthorized_redirect:
+        return unauthorized_redirect
+
+    return render_template("saved_courts.html", user=g.user, courts=g.user.courts)

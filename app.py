@@ -253,7 +253,9 @@ def edit_user_profile(username):
 @login_required
 def search_for_courts():
     """If a user is logged in, take them to the page to search for basketball courts."""
-    return render_template("search.html", api_key=api_key)
+
+    courts_data = [court.serialize() for court in g.user.courts]
+    return render_template("search.html", api_key=api_key, courts=courts_data)
 
 
 @app.route("/save_court", methods=["POST"])
@@ -274,17 +276,15 @@ def save_court():
         )
         db.session.add(saved_court)
         db.session.commit()
-        return jsonify({"message": "Court saved successfully!"}), 201
-    except IntegrityError as e:
+        # app.logger.debug(f"Saved court id: {saved_court.id}")
+        data_to_return = {
+            "message": "Court saved successfully",
+            "id": saved_court.id
+        }
+        return jsonify(data_to_return), 201
+    except Exception as e:
         db.session.rollback()
-        app.logger.error(f"IntegrityError: {e}")
-        if "google_maps_place_id" in str(e.orig):
-            return jsonify({"error": "Court already saved"}), 409
-        else:
-            return (
-                jsonify({"error": "An unexpected error occured. Please try again"}),
-                500,
-            )
+        app.logger.error(f"Unexpected error: {e}")
     except:
         return jsonify({"error": "An unexpected error occured. Please try again"}), 500
 
@@ -307,6 +307,8 @@ def view_saved_courts(username):
 @login_required
 def remove_saved_court():
     """Remove's a saved court from the saved_courts page and from the database."""
+    
+    # print("Received data:", request.json)
 
     data = request.get_json()
     if not data:

@@ -2,6 +2,10 @@
 let map;
 let infoWindow;
 let markers = [];
+const savedCourtMapping = {};
+savedCourts.forEach((sc) => {
+  savedCourtMapping[sc.google_maps_place_id] = sc.id;
+});
 
 async function initMap() {
   // The center of the United States. Zoomed out.
@@ -20,7 +24,6 @@ async function initMap() {
 
   // Create an info window to share between markers.
   infoWindow = new InfoWindow();
-
   initSearchBar();
 }
 
@@ -75,15 +78,45 @@ async function saveCourt(court) {
     court_name: court.displayName,
     google_maps_place_id: court.id,
     address: court.formattedAddress,
-    google_maps_url: court.googleMapsURI
+    google_maps_url: court.googleMapsURI,
   };
 
   try {
     const response = await axios.post("/save_court", data, {
       headers: {
-        "Content-Type": "application/json"
-      }
+        "Content-Type": "application/json",
+      },
     });
+    console.log("Server response:", response.data);
+
+    const newCourtId = response.data.id;
+    savedCourts.push({
+      google_maps_place_id: court.id,
+      id: newCourtId,
+    });
+    savedCourtMapping[court.id] = newCourtId;
+  } catch (error) {
+    console.error("Error:", error);
+  }
+}
+
+async function removeCourt(court) {
+  const savedCourtId = savedCourtMapping[court.id];
+  console.log("Removing court with data:", savedCourtId);
+  const data = {
+    court_id: savedCourtId,
+  };
+
+  try {
+    const response = await axios.post("/remove_court", data, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    delete savedCourtMapping[court.id];
+    savedCourts = savedCourts.filter(
+      (sc) => sc.google_maps_place_id !== court.id
+    );
     console.log("Server response:", response.data);
   } catch (error) {
     console.error("Error:", error);
@@ -156,15 +189,40 @@ async function findCourts(searchPlace) {
 
         const infoWindowSave = document.createElement("button");
         infoWindowSave.setAttribute("type", "button");
-        infoWindowSave.ariaLabel = "Save Court"
-        infoWindowSave.classList.add("text-light", "mx-3", "info-window-unsaved")
-        infoWindowSave.innerHTML = "<i class='fa-regular fa-heart'></i>"
+        infoWindowSave.ariaLabel = "Save Court";
+        infoWindowSave.classList.add(
+          "text-light",
+          "mx-3",
+          "info-window-unsaved"
+        );
+
+        const isSaved = savedCourts.some(
+          (savedCourt) => savedCourt.google_maps_place_id === court.id
+        );
+        if (isSaved) {
+          infoWindowSave.innerHTML = "<i class='fa-solid fa-heart'></i>";
+        } else {
+          infoWindowSave.innerHTML = "<i class='fa-regular fa-heart'></i>";
+        }
+
         infoWindowSave.addEventListener("click", (event) => {
           event.preventDefault();
-          saveCourt(court);
-        })
+          const iconElement = infoWindowSave.querySelector("i");
 
-        infoWindowContent.append(infoWindowAddress, infoWindowMapsLink, infoWindowSave);
+          if (iconElement.classList.contains("fa-solid")) {
+            removeCourt(court);
+            infoWindowSave.innerHTML = "<i class='fa-regular fa-heart'></i>";
+          } else {
+            saveCourt(court);
+            infoWindowSave.innerHTML = "<i class='fa-solid fa-heart'></i>";
+          }
+        });
+
+        infoWindowContent.append(
+          infoWindowAddress,
+          infoWindowMapsLink,
+          infoWindowSave
+        );
         infoWindow.close();
 
         const headerDiv = document.createElement("div");

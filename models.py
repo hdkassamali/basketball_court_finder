@@ -45,7 +45,7 @@ class User(db.Model):
             bio=bio,
             location=location,
         )
-    
+
     @classmethod
     def authenticate(cls, username, password):
         """Login a user checking for password hash to match database."""
@@ -80,6 +80,18 @@ class Court(db.Model):
         nullable=True,
         default=None,
     )
+
+    def serialize(self):
+        """Method to serialize court object data to be used as JSON."""
+        return {
+            "id": self.id,
+            "court_name": self.court_name,
+            "google_maps_place_id": self.google_maps_place_id,
+            "address": self.address,
+            "google_maps_url": self.google_maps_url,
+            "user_id": self.user_id,
+            "user_rating": self.user_rating,
+        }
 
 
 # When working in ipython, running seed file, or when using unittest framework use this connect_db function otherwise use the one below:

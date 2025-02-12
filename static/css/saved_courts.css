@@ -1,22 +1,40 @@
 .card {
-    transition: transform 0.3s ease;
-    border-radius: 10px;
+  transition: transform 0.3s ease;
+  border-radius: 10px;
 }
 
 .card:hover {
-    transform: translatey(-5px);
+  transform: translatey(-5px);
 }
 
 .card-title {
-    font-size: 1.5rem;
-    font-weight: 600;
+  font-size: 1.5rem;
+  font-weight: 600;
 }
 
 .card-text {
-    font-size: 1rem;
+  font-size: 1rem;
 }
 
 .bg-custom-primary:hover {
   background-color: #ff4e00;
 }
 
+.court-rating {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.court-rating .card-text {
+  margin-bottom: 0;
+}
+
+.court-rating-icon {
+  font-size: 1.5rem;
+  color: #ff4e00;
+}
+
+.court-rating-icon:hover {
+  cursor: pointer;
+}

@@ -19,10 +19,56 @@ const removeButtons = document.querySelectorAll(".remove-court-btn");
 for (const btn of removeButtons) {
   btn.addEventListener("click", (event) => {
     event.preventDefault();
-    const courtContainer = btn.closest(".court-container")
+    const courtContainer = btn.closest(".court-container");
     const courtId = courtContainer.dataset.courtId;
-    courtContainer.remove()
-    // console.log(courtId)
+    courtContainer.remove();
     removeCourt(courtId);
+  });
+}
+
+async function updateCourtRating(courtId, rating) {
+  const data = {
+    court_id: courtId,
+    rating: rating,
+  };
+
+  try {
+    const response = await axios.post("/update_court_rating", data, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    console.log("Rating update response:", response.data);
+  } catch (error) {
+    console.error("Error updating rating:", error);
+  }
+}
+
+function updateStarUi(star) {
+    const rating = parseInt(star.dataset.starValue, 10);
+
+    const courtContainer = star.closest(".court-container");
+    const courtId = courtContainer.dataset.courtId;
+
+    const stars = courtContainer.querySelectorAll(".court-rating-icon");
+    stars.forEach((s) => {
+      const starValue = parseInt(s.dataset.starValue, 10);
+      if (starValue <= rating) {
+        s.classList.remove("fa-regular");
+        s.classList.add("fa-solid");
+      } else {
+        s.classList.remove("fa-solid");
+        s.classList.add("fa-regular");
+      }
+    });
+    return {courtId, rating}
+}
+
+const starButtons = document.querySelectorAll(".court-rating-icon");
+for (const star of starButtons) {
+  star.addEventListener("click", (event) => {
+    event.preventDefault();
+    const {courtId, rating} = updateStarUi(star);
+    updateCourtRating(courtId, rating)
   });
 }

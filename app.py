@@ -276,16 +276,11 @@ def save_court():
         )
         db.session.add(saved_court)
         db.session.commit()
-        # app.logger.debug(f"Saved court id: {saved_court.id}")
-        data_to_return = {
-            "message": "Court saved successfully",
-            "id": saved_court.id
-        }
+        data_to_return = {"message": "Court saved successfully", "id": saved_court.id}
         return jsonify(data_to_return), 201
     except Exception as e:
         db.session.rollback()
         app.logger.error(f"Unexpected error: {e}")
-    except:
         return jsonify({"error": "An unexpected error occured. Please try again"}), 500
 
 
@@ -307,7 +302,7 @@ def view_saved_courts(username):
 @login_required
 def remove_saved_court():
     """Remove's a saved court from the saved_courts page and from the database."""
-    
+
     # print("Received data:", request.json)
 
     data = request.get_json()
@@ -320,4 +315,27 @@ def remove_saved_court():
         return jsonify({"message": "Court successfully deleted"}), 201
     except:
         db.session.rollback()
+        return jsonify({"error": "An unexpected error occured. Please try again"}), 500
+
+
+@app.route("/update_court_rating", methods=["POST"])
+@login_required
+def update_court_rating():
+    """Updates the user's rating for a specific court they have saved."""
+
+    data = request.get_json()
+    court_id = data.get("court_id")
+    rating = data.get("rating")
+
+    court = Court.query.get(court_id)
+    if not court:
+        return jsonify({"error": "Court not found"}), 404
+
+    try:
+        court.user_rating = rating
+        db.session.commit()
+        return jsonify({"message": "Rating updated successfully"}), 200
+    except Exception as e:
+        db.session.rollback()
+        app.logger.error(f"Unexpected error: {e}")
         return jsonify({"error": "An unexpected error occured. Please try again"}), 500

@@ -9,6 +9,7 @@
 
 {% block content %}
   <h1 class="text-center my-4">{{ user.username }}'s Saved Courts</h1>
+  {% if courts|length > 0 %}
   <div class="row">
     {% for court in courts %}
       <div class="col-md-6 col-lg-4 mb-4 court-container text-center" data-court-id="{{court.id}}">
@@ -35,4 +36,11 @@
       </div>
     {% endfor %}
   </div>
+  {% else %}
+  <div class="text-center my-5">
+    <h2 class="text-custom-accent">You haven't saved any courts yet baller!</h2>
+    <p>Start exploring and save your favorite courts for quick access later.</p>
+    <a href="/search" class="btn bg-custom-primary text-light fw-bold px-4 py-2">Search for Courts</a>
+  </div>
+  {% endif %}
 {% endblock %}

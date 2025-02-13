@@ -6,13 +6,15 @@ block content %}
   >
     The Court Connect
   </h1>
-  <h4 class="text-custom-secondary">
-    <strong
-      >Find and save your favorite basketball courts in a quick and convenient
-      way. So you can get back to doing what you love the most... Let's
-      hoop!</strong
-    >
-  </h4>
+  {% if g.user %}
+    <h4 class="text-custom-secondary">
+      <strong>Welcome back, {{ g.user.username }}! Ready to discover new courts or revisit your favorites? Let's hoop!</strong>
+    </h4>
+  {% else %}
+    <h4 class="text-custom-secondary">
+      <strong>Find and save your favorite basketball courts quickly and conveniently, so you can get back to doing what you love most... Hooping!</strong>
+    </h4>
+  {% endif %}
 </div>
 
 <div class="container text-center my-5">

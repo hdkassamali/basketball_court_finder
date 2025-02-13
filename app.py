@@ -157,7 +157,7 @@ def register():
             f"Hey {new_user.username}! Welcome to The Court Connect. Start finding courts near you!",
             "success",
         )
-        return redirect(f"/users/{new_user.username}/user_profile")
+        return redirect(f"/users/{new_user.username}/saved_courts")
 
     return render_template("register.html", form=form)
 
@@ -181,7 +181,7 @@ def login():
         if user:
             flash(f"Welcome back, {user.username}!", "success")
             do_login(user)
-            return redirect(f"/users/{user.username}/user_profile")
+            return redirect(f"/users/{user.username}/saved_courts")
         else:
             form.username.errors = ["Invalid username/password"]
 

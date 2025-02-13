@@ -49,6 +49,10 @@ input {
 }
 
 .info-window {
+  background: #fff;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   font-family: Arial, sans-serif;
   display: flex;
   flex-direction: column;
@@ -58,43 +62,46 @@ input {
 .info-window-header {
   font-weight: bold;
   font-size: 16px;
+  margin-bottom: 8px;
 }
 
 .info-window-address {
-  color: #333;
+  color: #555;
   font-size: 14px;
+  margin-bottom: 4px;
 }
 
 .info-window-maps-link {
   color: #1a73e8;
   font-size: 14px;
   text-decoration: none;
+  margin-bottom: 8px;
 }
 
 .info-window-maps-link:hover {
   text-decoration: underline;
 }
 
-.info-window-unsaved {
-  align-self: flex-end;
-  font-size: 20px;
-  color: #000000 !important;
-}
-
-.info-window-icon {
-  align-self: flex-end;
-  font-size: 20px;
-  color: #000000 !important;
-}
-
-button.info-window-unsaved {
+button.info-window-save-btn {
   background: transparent;
   border: none;
   padding: 0;
   margin: 0;
-  font: inherit;
-  color: inherit;
+  font-size: 24px;
   cursor: pointer;
+  transition: transform 0.2s ease;
+  align-self: flex-end;
+}
+button.info-window-save-btn:hover {
+  transform: scale(1.1);
+}
+
+button.info-window-save-btn i.fa-regular {
+  color: #ff5555;
+}
+
+button.info-window-save-btn i.fa-solid {
+  color: #ff0000;
 }
 
 .feedback {

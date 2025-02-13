@@ -64,7 +64,6 @@ async function initSearchBar() {
     const geocoder = new google.maps.Geocoder();
     geocoder.geocode({ address: inputValue }, async function (results, status) {
       if (status === "OK") {
-
         const searchPlace = results[0].geometry.location;
         const resultAmount = await findCourts(searchPlace);
         displaySearchFeedback(
@@ -72,14 +71,16 @@ async function initSearchBar() {
           `Showing ${resultAmount} results near: ${results[0].formatted_address}`,
           "info"
         );
-
       } else if (status === "ZERO_RESULTS") {
         displaySearchFeedback(
           searchArea,
           "No results found. Please check the address and try again."
         );
       } else {
-        displaySearchFeedback(searchArea, "Something went wrong, please try again!");
+        displaySearchFeedback(
+          searchArea,
+          "Something went wrong, please try again!"
+        );
       }
     });
     input.value = "";
@@ -149,6 +150,26 @@ async function removeCourt(court) {
   }
 }
 
+function toggleCourtSave(event, court, infoWindowSave) {
+  event.preventDefault();
+
+  infoWindowSave.disabled = true;
+
+  const iconElement = infoWindowSave.querySelector("i");
+
+  if (iconElement.classList.contains("fa-solid")) {
+    removeCourt(court);
+    infoWindowSave.innerHTML = "<i class='fa-regular fa-heart'></i>";
+  } else {
+    saveCourt(court);
+    infoWindowSave.innerHTML = "<i class='fa-solid fa-heart'></i>";
+  }
+
+  setTimeout(() => {
+    infoWindowSave.disabled = false;
+  }, 500);
+}
+
 async function findCourts(searchPlace) {
   // Empty markers from previous search;
   clearMarkers();
@@ -216,11 +237,7 @@ async function findCourts(searchPlace) {
         const infoWindowSave = document.createElement("button");
         infoWindowSave.setAttribute("type", "button");
         infoWindowSave.ariaLabel = "Save Court";
-        infoWindowSave.classList.add(
-          "text-light",
-          "mx-3",
-          "info-window-unsaved"
-        );
+        infoWindowSave.classList.add("info-window-save-btn");
 
         const isSaved = savedCourts.some(
           (savedCourt) => savedCourt.google_maps_place_id === court.id
@@ -231,18 +248,9 @@ async function findCourts(searchPlace) {
           infoWindowSave.innerHTML = "<i class='fa-regular fa-heart'></i>";
         }
 
-        infoWindowSave.addEventListener("click", (event) => {
-          event.preventDefault();
-          const iconElement = infoWindowSave.querySelector("i");
-
-          if (iconElement.classList.contains("fa-solid")) {
-            removeCourt(court);
-            infoWindowSave.innerHTML = "<i class='fa-regular fa-heart'></i>";
-          } else {
-            saveCourt(court);
-            infoWindowSave.innerHTML = "<i class='fa-solid fa-heart'></i>";
-          }
-        });
+        infoWindowSave.addEventListener("click", (event) =>
+          toggleCourtSave(event, court, infoWindowSave)
+        );
 
         infoWindowContent.append(
           infoWindowAddress,
@@ -252,7 +260,7 @@ async function findCourts(searchPlace) {
         infoWindow.close();
 
         const headerDiv = document.createElement("div");
-        headerDiv.classList.add("info-window-header");
+        headerDiv.classList.add("info-window-header", "text-center");
         headerDiv.innerText = court.displayName;
 
         infoWindow.setHeaderContent(headerDiv);

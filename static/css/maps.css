@@ -97,3 +97,21 @@ button.info-window-unsaved {
   cursor: pointer;
 }
 
+.feedback {
+  margin-top: 10px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.feedback.info {
+  background-color: #e7f3fe;
+  color: #31708f;
+  border: 1px solid #bce8f1;
+}
+
+.feedback.error {
+  background-color: #f2dede;
+  color: #a94442;
+  border: 1px solid #ebccd1;
+}

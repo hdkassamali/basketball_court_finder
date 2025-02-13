@@ -4,7 +4,7 @@
 <script type="module" src="{{url_for('static', filename='js/maps.js')}}"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
-let savedCourts = {{ courts|tojson }};
+  let savedCourts = {{ courts|tojson }};
 </script>
 {% endblock %}
 
@@ -16,20 +16,19 @@ let savedCourts = {{ courts|tojson }};
 </div>
 
 <div class="container mb-5 text-center" id="search-bar-container">
-<div class="card">
-<div class="card-body" id="search-area">
-<label for="search-bar-input"id="search-bar-label" class="text-custom-accent"> Search For 🏀 Courts Here 👉</label> 
-<input id="search-bar-input" type="text" placeholder="Search for a place...">
-<button id="search-bar-btn" class="btn btn-success">Submit</button>
-
-</div>
-</div>
+  <div class="card">
+    <div class="card-body" id="search-area">
+      <label for="search-bar-input"id="search-bar-label" class="text-custom-accent"> Search For 🏀 Courts Here 👉</label> 
+      <input id="search-bar-input" type="text" placeholder="Search for a place...">
+      <button id="search-bar-btn" class="btn btn-success">Submit</button>
+    </div>
+  </div>
 </div> 
+
 <!--The div element for the map -->
  <div class="container" id="map-container">
   <div class="mt-5 mb-5" id="map"></div>
 </div> 
-
 {% endblock %}
 
 {% block body_scripts %}
@@ -40,6 +39,4 @@ let savedCourts = {{ courts|tojson }};
     v: "weekly",
   });
 </script>
-
-
 {% endblock %}

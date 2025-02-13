@@ -27,33 +27,59 @@ async function initMap() {
   initSearchBar();
 }
 
+function displaySearchFeedback(searchArea, message, type = "error") {
+  let existingMessage = document.getElementById("feedback-message");
+  if (existingMessage) {
+    existingMessage.remove();
+  }
+  if (message.trim() === "") return;
+
+  const messageElement = document.createElement("div");
+  messageElement.id = "feedback-message";
+  messageElement.textContent = message;
+  messageElement.classList.add("feedback", type);
+  searchArea.appendChild(messageElement);
+
+  if (type !== "info") {
+    setTimeout(() => {
+      messageElement.remove();
+    }, 3000);
+  }
+}
+
 async function initSearchBar() {
   const { Geocoder } = await google.maps.importLibrary("geocoding");
   const input = document.getElementById("search-bar-input");
   const button = document.getElementById("search-bar-btn");
   const searchArea = document.getElementById("search-area");
-  const resulting_address = document.createElement("p");
 
-  button.addEventListener("click", () => {
+  button.addEventListener("click", async () => {
     const inputValue = input.value.trim();
     console.log(inputValue);
+    if (inputValue.length < 1) {
+      displaySearchFeedback(searchArea, "Please enter a search term.");
+      return;
+    }
 
     const geocoder = new google.maps.Geocoder();
-    geocoder.geocode({ address: inputValue }, function (results, status) {
-      if (status == "OK") {
-        resulting_address.textContent = "";
+    geocoder.geocode({ address: inputValue }, async function (results, status) {
+      if (status === "OK") {
 
         const searchPlace = results[0].geometry.location;
-        findCourts(searchPlace);
+        const resultAmount = await findCourts(searchPlace);
+        displaySearchFeedback(
+          searchArea,
+          `Showing ${resultAmount} results near: ${results[0].formatted_address}`,
+          "info"
+        );
 
-        resulting_address.textContent = `Showing results near: ${results[0].formatted_address}`;
-        searchArea.append(resulting_address);
-      } else if (status == "ZERO_RESULTS") {
-        alert(
-          "No results for your search. You may have entered an invalid address. Please try again!"
+      } else if (status === "ZERO_RESULTS") {
+        displaySearchFeedback(
+          searchArea,
+          "No results found. Please check the address and try again."
         );
       } else {
-        alert("Something went wrong, please try again!");
+        displaySearchFeedback(searchArea, "Something went wrong, please try again!");
       }
     });
     input.value = "";
@@ -236,6 +262,7 @@ async function findCourts(searchPlace) {
       markers.push(marker);
     });
     map.fitBounds(bounds);
+    return places.length;
   } else {
     console.log("No Results");
   }

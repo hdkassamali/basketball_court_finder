@@ -45,6 +45,10 @@ h1 {
   background-color: #ff4e00;
 }
 
+#user_profile_saved_courts_btn:hover {
+  background-color: #1a2e44;
+}
+
 #submit_btn:hover {
   background-color: #1a2e44;
 }

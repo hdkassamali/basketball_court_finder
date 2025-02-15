@@ -32,9 +32,12 @@ endblock %} {% block content %}
           {{user.location}}
         </li>
       </ul>
-      <div class="text-center mt-4">
+      <div class="d-flex justify-content-center gap-3 mt-4">
         <a href="/users/{{user.username}}/edit_profile" id="edit_user_details_btn" class="btn bg-custom-primary text-light fw-bold px-4 py-2">
           Edit User Details
+        </a>
+        <a href="/users/{{user.username}}/saved_courts" id="user_profile_saved_courts_btn" class="btn bg-custom-secondary text-light fw-bold px-4 py-2">
+          View Saved Courts
         </a>
       </div>
     </div>

@@ -48,3 +48,9 @@ h1 {
 #submit_btn:hover {
   background-color: #1a2e44;
 }
+
+.alert {
+  max-width: 600px;
+  margin: 0 auto 15px auto; 
+  text-align: center;
+}

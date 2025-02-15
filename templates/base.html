@@ -77,7 +77,9 @@
 
     <div class="container mt-5">
       {% for category, msg in get_flashed_messages(with_categories=True) %}
-      <div class="alert alert-{{category}}">{{ msg }}</div>
+      <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
+        {{ msg }}
+      </div>
       {% endfor %} {% block content %} {% endblock %}
     </div>
 
@@ -112,5 +114,26 @@
 
     <!-- If additional scripts are needed in the body of a certain template -->
     {% block body_scripts %} {% if body_scripts %} {% endif %} {% endblock %}
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        setTimeout(function () {
+          let alerts = document.querySelectorAll(".alert");
+          alerts.forEach(function (alert) {
+            let fadeEffect = setInterval(function () {
+              if (!alert.style.opacity) {
+                alert.style.opacity = 1;
+              }
+              if (alert.style.opacity > 0) {
+                alert.style.opacity -= 0.05;
+              } else {
+                clearInterval(fadeEffect);
+                // alert.remove(); //
+              }
+            }, 50);
+          });
+        }, 3000);
+      });
+    </script>
+
   </body>
 </html>

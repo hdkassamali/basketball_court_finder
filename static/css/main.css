@@ -9,34 +9,44 @@ h1 {
   letter-spacing: 1px;
 }
 
-.map_image {
+#map_image {
   width: 70%;
   height: 70%;
 }
 
-.navbar_title {
+.navbar-light .navbar-toggler-icon {
+  filter: invert(1);
+}
+
+.navbar-title {
   font-weight: bold;
   transition: transform 0.3s ease, color 0.3s ease;
 }
 
-.navbar_title:hover,
-.navbar_link:hover {
+.navbar-title:hover:hover,
+.navbar-link:hover {
   transform: scale(1.05);
 }
 
-.navbar_link {
+.navbar-link {
   transition: color 0.2s ease, transform 0.2s ease;
 }
 
-.homepage_link {
+@media (max-width: 991px) {
+  .navbar-link:hover {
+    transform: scale(1.01);
+  }
+}
+
+.homepage-link {
   text-decoration: none;
 }
 
-.homepage_link:hover {
+.homepage-link:hover {
   text-decoration: underline;
 }
 
-.homepage_card {
+.homepage-card {
   max-width: 50%;
   margin: auto;
 }
@@ -55,6 +65,6 @@ h1 {
 
 .alert {
   max-width: 600px;
-  margin: 0 auto 15px auto; 
+  margin: 0 auto 15px auto;
   text-align: center;
 }

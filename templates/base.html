@@ -45,33 +45,41 @@
   <body class="bg-light text-custom-primary">
     <nav class="navbar navbar-expand-lg navbar-light bg-custom-accent">
       <div class="container">
-        <a href="/" class="navbar-brand text-light navbar_title">The Court Connect</a>
-        <ul class="navbar-nav ml-auto">
-          {% if g.user %}
-          <li class="nav-item navbar-text text-light me-3">
-           {{ g.user.first_name + " " + g.user.last_name }}
-        </li>
-          <li class="nav-item">
-          <a class="nav-link me-3 text-light" href="/search"><i class="fa-solid fa-magnifying-glass"></i></a>
+        <a href="/" class="navbar-brand text-light navbar-title">The Court Connect</a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav ms-auto">
+            {% if g.user %}
+            <li class="nav-item navbar-text text-light me-3">
+            {{ g.user.first_name + " " + g.user.last_name }}
           </li>
-          <li class="nav-item">
-          <a class="nav-link me-3 text-light" href="/users/{{g.user.username}}/saved_courts"><i class="fa-solid fa-basketball"></i></a>
-          </li>
-          <li class="nav-item">
-          <a class="nav-link me-3 text-light" href="/users/{{g.user.username}}/user_profile"><i class="fa-solid fa-user-large"></i></a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link me-3 text-light" href="/logout">Logout</a>
-          </li>
-          {% else %}
-          <li class="nav-item">
-            <a class="nav-link me-3 text-light navbar_link" href="/login">Login</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link me-3 text-light navbar_link" href="/register">Sign Up</a>
-          </li>
-          {% endif %}
-        </ul>
+            <li class="nav-item">
+            <a class="nav-link me-3 text-light navbar-link" href="/search"><i class="fa-solid fa-magnifying-glass"></i></a>
+            </li>
+            <li class="nav-item">
+            <a class="nav-link me-3 text-light navbar-link" href="/users/{{g.user.username}}/saved_courts"><i class="fa-solid fa-basketball"></i></a>
+            </li>
+            <li class="nav-item">
+            <a class="nav-link me-3 text-light navbar-link" href="/users/{{g.user.username}}/user_profile"><i class="fa-solid fa-user-large"></i></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link me-3 text-light navbar-link" href="/logout">Logout</a>
+            </li>
+            {% else %}
+            <li class="nav-item">
+              <a class="nav-link me-3 text-light navbar-link" href="/login">Login</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link me-3 text-light navbar-link" href="/register">Sign Up</a>
+            </li>
+            {% endif %}
+          </ul>
+        </div>
       </div>
     </nav>
 
@@ -114,6 +122,13 @@
 
     <!-- If additional scripts are needed in the body of a certain template -->
     {% block body_scripts %} {% if body_scripts %} {% endif %} {% endblock %}
+    <!-- Bootstrap JS CDN -->
+    
+    <script 
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" 
+      crossorigin="anonymous">
+    </script>
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         setTimeout(function () {

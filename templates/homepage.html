@@ -19,7 +19,8 @@ block content %}
 
 <div class="container text-center my-5">
   <img
-    class="map_image rounded shadow"
+    id="map_image"
+    class="rounded shadow"
     src="{{ url_for('static', filename='images/basketball_court_finder_example.png') }}"
     alt="Google Maps Basketball Court Finder"
     style="max-width: 100%; height: auto"
@@ -30,10 +31,10 @@ block content %}
   <div class="row justify-content-center g-4">
   {% if not g.user %}
     <div class="col-md-5">
-      <div class="card shadow-lg bg-custom-secondary border-0 rounded-4 homepage_card">
+      <div class="card shadow-lg bg-custom-secondary border-0 rounded-4 homepage-card">
         <div class="card-body text-center">
           <h5 class="card-title">
-            <a href="/register" class="text-light homepage_link">
+            <a href="/register" class="text-light homepage-link">
               <strong>Sign up today to start searching!</strong>
             </a>
           </h5>
@@ -41,10 +42,10 @@ block content %}
       </div>
     </div>
     <div class="col-md-5">
-      <div class="card shadow-lg bg-custom-accent border-0 rounded-4 homepage_card">
+      <div class="card shadow-lg bg-custom-accent border-0 rounded-4 homepage-card">
         <div class="card-body text-center">
           <h5 class="card-title">
-            <a class="text-light homepage_link" href="/login">
+            <a class="text-light homepage-link" href="/login">
               <strong>Login to view your saved courts!</strong>
             </a>
           </h5>
@@ -53,10 +54,10 @@ block content %}
     </div>
     {% else %}
     <div class="col-md-5">
-      <div class="card shadow-lg bg-custom-secondary border-0 rounded-4 homepage_card">
+      <div class="card shadow-lg bg-custom-secondary border-0 rounded-4 homepage-card">
         <div class="card-body text-center">
           <h5 class="card-title">
-            <a href="/search" class="text-light homepage_link">
+            <a href="/search" class="text-light homepage-link">
               <strong>Search for basketball courts!</strong>
             </a>
           </h5>
@@ -64,10 +65,10 @@ block content %}
       </div>
     </div>
     <div class="col-md-5">
-      <div class="card shadow-lg bg-custom-accent border-0 rounded-4 homepage_card">
+      <div class="card shadow-lg bg-custom-accent border-0 rounded-4 homepage-card">
         <div class="card-body text-center">
           <h5 class="card-title">
-            <a class="text-light homepage_link" href="/users/{{g.user.username}}/saved_courts">
+            <a class="text-light homepage-link" href="/users/{{g.user.username}}/saved_courts">
               <strong>View your saved courts!</strong>
             </a>
           </h5>

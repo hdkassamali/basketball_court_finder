@@ -6,6 +6,7 @@ from functools import wraps
 from sqlalchemy.exc import IntegrityError
 import os
 from dotenv import load_dotenv
+load_dotenv()
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql:///basketball_court_finder_db"
@@ -15,7 +16,6 @@ app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 app.config["DEBUG_TB_INTERCEPT_REDIRECTS"] = False
 toolbar = DebugToolbarExtension(app)
 
-load_dotenv()
 api_key = os.getenv("GOOGLE_MAPS_API_KEY")
 
 # When working in ipython, running seed file, or when using unittest framework run the line below:
@@ -303,18 +303,25 @@ def view_saved_courts(username):
 def remove_saved_court():
     """Remove's a saved court from the saved_courts page and from the database."""
 
-    # print("Received data:", request.json)
-
     data = request.get_json()
     if not data:
         return jsonify({"error": "No input data provided"}), 400
+
     try:
         court_id = data.get("court_id")
-        Court.query.filter_by(id=court_id).delete()
+        court = Court.query.get(court_id)
+        if not court:
+            return jsonify({"error": "Court not found"}), 404
+
+        if court.user_id != g.user.id:
+            return jsonify({"error": "Unauthorized action"}), 403
+        # Court.query.filter_by(id=court_id).delete()
+        db.session.delete(court)
         db.session.commit()
-        return jsonify({"message": "Court successfully deleted"}), 201
-    except:
+        return jsonify({"message": "Court successfully deleted"}), 200
+    except Exception as e:
         db.session.rollback()
+        app.logger.error(f"Unexpected error: {e}")
         return jsonify({"error": "An unexpected error occured. Please try again"}), 500
 
 
@@ -330,6 +337,9 @@ def update_court_rating():
     court = Court.query.get(court_id)
     if not court:
         return jsonify({"error": "Court not found"}), 404
+    
+    if court.user_id != g.user.id:
+        return jsonify({"error": "Unauthorized action"}), 403
 
     try:
         court.user_rating = rating

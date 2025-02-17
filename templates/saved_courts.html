@@ -9,7 +9,7 @@
 
 {% block content %}
   <h1 class="text-center my-4">{{ user.username }}'s Saved Courts</h1>
-  {% if courts|length > 0 %}
+  {% if courts.items|length > 0 %}
   <div class="row">
     {% for court in courts %}
       <div class="col-md-6 col-lg-4 mb-4 court-container text-center" data-court-id="{{court.id}}">
@@ -36,6 +36,49 @@
       </div>
     {% endfor %}
   </div>
+
+  <nav aria-label="Court Pagination">
+    <ul class="pagination justify-content-center">
+      {% if courts.has_prev %}
+      <li class="page-item">
+        <a class="page-link" href="{{ url_for('view_saved_courts', username=user.username, page=courts.prev_num) }}" aria-label="Previous">
+          <span aria-hidden="true">&lsaquo;</span>
+        </a>
+      </li>
+      {% else %}
+      <li class="page-item disabled">
+        <span class="page-link" aria-label="Previous">
+          <span aria-hidden="true">&lsaquo;</span>
+        </span>
+      </li>
+      {% endif %}
+
+      {% for p in range(1, courts.pages + 1) %}
+        {% if p == courts.page %}
+          <li class="page-item active"><span class="page-link">{{ p }}</span></li>
+        {% else %}
+          <li class="page-item">
+            <a class="page-link" href="{{ url_for('view_saved_courts', username=user.username, page=p) }}">{{ p }}</a>
+          </li>
+        {% endif %}
+      {% endfor %}
+
+      {% if courts.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="{{ url_for('view_saved_courts', username=user.username, page=courts.next_num) }}" aria-label="Next">
+          <span aria-hidden="true">&rsaquo;</span>
+        </a>
+      </li>
+      {% else %}
+      <li class="page-item disabled">
+        <span class="page-link" aria-label="Next">
+          <span aria-hidden="true">&rsaquo;</span>
+        </span>
+      </li>
+      {% endif %}
+    </ul>
+  </nav>
+
   {% else %}
   <div class="text-center my-5">
     <h2 class="text-custom-accent">You haven't saved any courts yet baller!</h2>

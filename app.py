@@ -287,15 +287,26 @@ def save_court():
 @app.route("/users/<username>/saved_courts")
 @login_required
 def view_saved_courts(username):
-    """Allow a user to view their saved courts.
-    Checks if user is unauthorized. E.G. If they are trying to access another user's saved courts.
+    """
+    Allow a user to view their saved courts.
+
+    This function checks if the user is authorized to access the saved courts for the specified username.
+    It retrieves and displays only the set of courts for the current page (paginated), ensuring that only a subset of the user's saved courts are shown at a time.
     """
 
     unauthorized_redirect = check_user_authorized(username)
     if unauthorized_redirect:
         return unauthorized_redirect
 
-    return render_template("saved_courts.html", user=g.user, courts=g.user.courts)
+    page = request.args.get("page", 1, type=int)
+    courts_paginated = (
+        Court.query
+        .filter_by(user_id=g.user.id)
+        .order_by(Court.id.desc())
+        .paginate(page=page, per_page=15)
+    )
+
+    return render_template("saved_courts.html", user=g.user, courts=courts_paginated)
 
 
 @app.route("/remove_court", methods=["POST"])

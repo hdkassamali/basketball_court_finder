@@ -38,3 +38,13 @@
 .court-rating-icon:hover {
   cursor: pointer;
 }
+
+.pagination .page-item.active .page-link {
+  background-color: var(--bs-custom-secondary);
+  border-color: var(--bs-custom-secondary);
+  color: #fff;
+}
+
+.pagination .page-link {
+  color: var(--bs-custom-secondary);
+}

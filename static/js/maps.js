@@ -167,7 +167,7 @@ function toggleCourtSave(event, court, infoWindowSave) {
 
   setTimeout(() => {
     infoWindowSave.disabled = false;
-  }, 500);
+  }, 250);
 }
 
 async function findCourts(searchPlace) {

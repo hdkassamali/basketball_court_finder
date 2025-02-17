@@ -91,12 +91,16 @@
       </div>
     </nav>
 
-    <div class="container mt-5">
-      {% for category, msg in get_flashed_messages(with_categories=True) %}
+    <div id="flash_container">
+    {% for category, msg in get_flashed_messages(with_categories=True) %}
       <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
         {{ msg }}
       </div>
-      {% endfor %} {% block content %} {% endblock %}
+    {% endfor %} 
+    </div>
+
+    <div class="container mt-5">
+      {% block content %} {% endblock %}
     </div>
 
     <footer class="bg-custom-accent text-light py-1">
@@ -144,13 +148,13 @@
           alerts.forEach(function (alert) {
             let fadeEffect = setInterval(function () {
               if (!alert.style.opacity) {
-                alert.style.opacity = 1;
+                alert.style.opacity = 0.7;
               }
               if (alert.style.opacity > 0) {
                 alert.style.opacity -= 0.05;
               } else {
                 clearInterval(fadeEffect);
-                // alert.remove(); //
+                alert.remove(); 
               }
             }, 50);
           });

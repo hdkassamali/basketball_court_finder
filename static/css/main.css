@@ -91,3 +91,13 @@ h1 {
   overflow-wrap: break-word;
   margin: 0 auto;
 }
+
+.profile-username, .saved-courts-header, .search-page-header, .form-header {
+  font-size: 3rem;
+}
+
+@media (max-width: 576px) {
+  .profile-username, .saved-courts-header, .search-page-header, .form-header {
+    font-size: 2rem;
+  }
+}

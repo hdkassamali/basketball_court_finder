@@ -122,3 +122,23 @@ button.info-window-save-btn i.fa-solid {
   color: #a94442;
   border: 1px solid #ebccd1;
 }
+
+@media (max-width: 576px) {
+  #search-bar-input {
+    text-align: center;
+  }
+}
+
+@media (max-width: 991px) {
+  #map {
+    width: 100%;
+  }
+}
+
+@media (max-width: 465px) {
+  #search-area label,
+  #search-area input {
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+}

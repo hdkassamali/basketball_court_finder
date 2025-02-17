@@ -8,7 +8,7 @@
 {% block title %}{{user.username}}'s Saved Courts{% endblock %}
 
 {% block content %}
-  <h1 class="text-center my-4">{{ user.username }}'s Saved Courts</h1>
+  <h1 class="text-center my-4 text-custom-primary saved-courts-header">{{ user.username }}'s Saved Courts</h1>
   {% if courts.items|length > 0 %}
   <div class="row">
     {% for court in courts %}

@@ -29,6 +29,31 @@
  <div class="container" id="map-container">
   <div class="mt-5 mb-5" id="map"></div>
 </div> 
+
+<!-- Disclaimer Link -->
+<div class="container text-center mb-3">
+  <a href="#" id="disclaimerLink" class="small text-custom-accent">Disclaimer</a>
+</div>
+
+<!-- Disclaimer Modal Markup -->
+<div class="modal fade" id="disclaimerModal" tabindex="-1" aria-labelledby="disclaimerModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="disclaimerModalLabel">Disclaimer</h5>
+      </div>
+      <div class="modal-body">
+        <p>This application primarily searches for parks in your area with basketball courts. However, the court location information may not be fully accurate for your search.</p>
+        <p>The address/location you input into the search bar may not show the correct location you want to search for. If the correct location isn't showing up, try being more specific with your address input.</p>
+        <p>Location data outside of the United States may be less accurate.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
 
 {% block body_scripts %}

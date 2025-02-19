@@ -1,3 +1,14 @@
+const disclaimerLink = document.getElementById("disclaimerLink");
+if (disclaimerLink) {
+  disclaimerLink.addEventListener("click", function (event) {
+    event.preventDefault();
+    const disclaimerModalEl = document.getElementById("disclaimerModal");
+    if (disclaimerModalEl) {
+      const disclaimerModal = new bootstrap.Modal(disclaimerModalEl);
+      disclaimerModal.show();
+    }
+  });
+}
 // Initialize and add the map
 let map;
 let infoWindow;

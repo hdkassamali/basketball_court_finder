@@ -1,21 +1,30 @@
-{% extends "base.html" %} {% block content %}
-<h1 class="text-center my-4 text-custom-primary form-header">{% block form_title %}{% endblock %}</h1>
-<p class="lead">{% block form_description %} {% endblock %}</p>
+{% extends "base.html" %} 
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <h1 class="text-center my-4 text-custom-primary form-header">
+      {% block form_title %}{% endblock %}
+    </h1>
+    <p class="lead text-custom-accent">{% block form_description %} {% endblock %}</p>
 
-<form method="POST" class="mb-4">
-  {{ form.hidden_tag() }} 
-  {% for field in form if field.widget.input_type != "hidden" %}
-  <div class="mb-3">
-    <label for="{{field.id}}" class="form-label">{{field.label}}</label>
-    {{ field(class_="form-control")}} 
-    {% for error in field.errors %}
-    <span class="form-text text-danger">{{ error }}</span>
-    {% endfor %}
+    <form method="POST" class="mb-4">
+     {{ form.hidden_tag() }} 
+     {% for field in form if field.widget.input_type != "hidden" %}
+     <div class="mb-3">
+        <label for="{{field.id}}" class="form-label text-custom-primary">{{field.label}}</label>
+        {{ field(class_="form-control")}} 
+        {% for error in field.errors %}
+        <span class="form-text text-danger">{{ error }}</span>
+        {% endfor %}
+      </div>
+      {% endfor %}
+      <button id="submit_btn" class="btn text-light bg-custom-secondary" type="submit">
+        {% block submit_text %}{% endblock %}
+      </button>
+      {% block cancel_url %} 
+        {% if cancel_url %} {% endif %} 
+      {% endblock %}
+    </form>
   </div>
-  {% endfor %}
-  <button id="submit_btn" class="btn text-light bg-custom-secondary" type="submit">
-  {% block submit_text %}{% endblock %}
-  </button>
-  {% block cancel_url %} {% if cancel_url %} {% endif %} {% endblock %}
-</form>
+</div>
 {% endblock %}

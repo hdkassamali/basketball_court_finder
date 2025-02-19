@@ -54,10 +54,17 @@ h1 {
 
 #edit_user_details_btn:hover {
   background-color: #ff4e00;
+  transform: scale(1.01);
 }
 
 #user_profile_saved_courts_btn:hover {
   background-color: #1a2e44;
+  transform: scale(1.01);
+}
+
+#user_profile_search_courts_btn:hover {
+  background-color: #222222;
+  transform: scale(1.01);
 }
 
 #submit_btn:hover {

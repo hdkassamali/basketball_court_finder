@@ -36,6 +36,9 @@
       href="{{url_for('static', filename='css/main.css')}}"
     />
 
+    <!-- Favicon -->
+    <link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}" type="image/x-icon">
+
     <!-- If additional scripts are needed in the head of a certain template -->
     {% block head_scripts %} {% if head_scripts %} {% endif %} {% endblock %}
 
@@ -118,11 +121,17 @@
             <i class="fab fa-linkedin fa-lg"></i>
           </a>
           <a
-            href="https://hdkassamali.github.io/cv/"
+            href="https://calendly.com/hadi-kassamali/30-min"
             target="_blank"
             class="text-light mx-3"
           >
-            <i class="fas fa-globe fa-lg"></i>
+            <i class="fa-regular fa-calendar fa-lg"></i>
+          </a>
+          <a
+            href="mailto:hdkassamali1623@gmail.com"
+            class="text-light mx-3"
+          >
+            <i class="fa-solid fa-envelope fa-lg"></i>
           </a>
         </div>
       </div>

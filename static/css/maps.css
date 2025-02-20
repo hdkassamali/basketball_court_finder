@@ -126,6 +126,9 @@ button.info-window-save-btn i.fa-solid {
 @media (max-width: 576px) {
   #search-bar-input {
     text-align: center;
+    width: 80%;
+    display:block;
+    margin: 0 auto;
   }
 }
 
@@ -135,7 +138,13 @@ button.info-window-save-btn i.fa-solid {
   }
 }
 
-@media (max-width: 465px) {
+@media (max-width: 576px) {
+  #search-bar-container .card {
+    width: 100%;
+  }
+}
+
+@media (max-width: 576px) {
   #search-area label,
   #search-area input {
     display: block;

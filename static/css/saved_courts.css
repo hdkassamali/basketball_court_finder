@@ -48,3 +48,9 @@
 .pagination .page-link {
   color: var(--bs-custom-secondary);
 }
+
+@media (min-width: 992px) and (max-width: 1199px) { 
+  .remove-court-btn {
+    margin-top: 0.5rem;
+  }
+}

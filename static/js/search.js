@@ -1,3 +1,4 @@
+// Disclaimer Modal Click Functionality
 const disclaimerLink = document.getElementById("disclaimerLink");
 if (disclaimerLink) {
   disclaimerLink.addEventListener("click", function (event) {
@@ -9,6 +10,7 @@ if (disclaimerLink) {
     }
   });
 }
+
 // Initialize and add the map
 let map;
 let infoWindow;
@@ -18,14 +20,20 @@ savedCourts.forEach((sc) => {
   savedCourtMapping[sc.google_maps_place_id] = sc.id;
 });
 
+/**
+ * Initializes the Google Map and its UI components.
+ *
+ * This asynchronous function imports the necessary map libraries, creates a map centered
+ * on the United States with a hybrid map type, sets up an info window shared among markers,
+ * and initializes the search bar.
+ *
+ * @async
+ * @returns {Promise<void>} A promise that resolves when the map is fully initialized.
+ */
 async function initMap() {
-  // The center of the United States. Zoomed out.
   const center = { lat: 39.8283, lng: -98.5795 };
 
-  // Request map libraries.
   const { Map, InfoWindow } = await google.maps.importLibrary("maps");
-
-  // The map, centered at the center of the US.
   map = new Map(document.getElementById("map"), {
     zoom: 4,
     center,
@@ -33,11 +41,16 @@ async function initMap() {
     mapTypeId: "hybrid",
   });
 
-  // Create an info window to share between markers.
   infoWindow = new InfoWindow();
   initSearchBar();
 }
-
+/**
+ * Displayes a feedback message to user within the specified search area.
+ *
+ * @param {HTMLElement} searchArea - The container element where the feedback should be displayed.
+ * @param {string} message - The feedback message to display
+ * @param {string} [type="error"] - The type of message (e.g., "error" or "info") that influences styling.
+ */
 function displaySearchFeedback(searchArea, message, type = "error") {
   let existingMessage = document.getElementById("feedback-message");
   if (existingMessage) {
@@ -58,43 +71,64 @@ function displaySearchFeedback(searchArea, message, type = "error") {
   }
 }
 
+/**
+ * Performs a geocoding search based on user input and displays search feedback.
+ *
+ * This function retrieves the search term from the input element, uses the Geocoder to get location details, and then calls FindCourts to locate basketball courts near the search location.
+ *
+ * @async
+ * @param {object} Geocoder - The geocoding module imported from Google Maps.
+ * @param {HTMLElement} searchArea - The container where search feedback messages will be displayed.
+ * @param {HTMLInputElement} searchInput - The input element containing the search term.
+ * @returns {Promise<void>}
+ */
+async function performSearch(Geocoder, searchArea, searchInput) {
+  const inputValue = searchInput.value.trim();
+  if (inputValue.length < 1) {
+    displaySearchFeedback(searchArea, "Please enter a search term.");
+    return;
+  }
+
+  const geocoder = new google.maps.Geocoder();
+  geocoder.geocode({ address: inputValue }, async (results, status) => {
+    if (status === "OK") {
+      const searchPlace = results[0].geometry.location;
+      const amountOfCourts = await findCourts(searchPlace);
+      displaySearchFeedback(
+        searchArea,
+        `Showing ${amountOfCourts} results near: ${results[0].formatted_address}`,
+        "info"
+      );
+    } else if (status === "ZERO_RESULTS") {
+      displaySearchFeedback(
+        searchArea,
+        "No results found. Please check the address and try again."
+      );
+    } else {
+      displaySearchFeedback(
+        searchArea,
+        "Something went wrong, please try again!"
+      );
+    }
+  });
+  searchInput.value = "";
+}
+
+/**
+ * Initializes the search bar functionality by importing the Geocoder library
+ * and setting up the event listener on the search button.
+ *
+ * @async
+ * @returns {Promise<void>}
+ */
 async function initSearchBar() {
   const { Geocoder } = await google.maps.importLibrary("geocoding");
-  const input = document.getElementById("search-bar-input");
-  const button = document.getElementById("search-bar-btn");
   const searchArea = document.getElementById("search-area");
+  const searchInput = document.getElementById("search-bar-input");
+  const searchButton = document.getElementById("search-bar-btn");
 
-  button.addEventListener("click", async () => {
-    const inputValue = input.value.trim();
-    console.log(inputValue);
-    if (inputValue.length < 1) {
-      displaySearchFeedback(searchArea, "Please enter a search term.");
-      return;
-    }
-
-    const geocoder = new google.maps.Geocoder();
-    geocoder.geocode({ address: inputValue }, async function (results, status) {
-      if (status === "OK") {
-        const searchPlace = results[0].geometry.location;
-        const resultAmount = await findCourts(searchPlace);
-        displaySearchFeedback(
-          searchArea,
-          `Showing ${resultAmount} results near: ${results[0].formatted_address}`,
-          "info"
-        );
-      } else if (status === "ZERO_RESULTS") {
-        displaySearchFeedback(
-          searchArea,
-          "No results found. Please check the address and try again."
-        );
-      } else {
-        displaySearchFeedback(
-          searchArea,
-          "Something went wrong, please try again!"
-        );
-      }
-    });
-    input.value = "";
+  searchButton.addEventListener("click", () => {
+    performSearch(Geocoder, searchArea, searchInput);
   });
 }
 
@@ -105,12 +139,20 @@ function clearMarkers() {
       if (marker.setMap) marker.setMap(null);
       if (marker.unbindAll) marker.unbindAll();
     } catch (e) {
+    // TODO: Update this to show user an error message
       console.warn("Error removing marker:", e);
     }
   });
   markers = [];
 }
 
+/**
+ * Saves the provided court data to the server and updates local savedCourts data.
+ *
+ * @async
+ * @param {object} court - The court object containing details like displayName, id, formattedAddress, and googleMapsURI.
+ * @returns {Promise<void>}
+ */
 async function saveCourt(court) {
   const data = {
     court_name: court.displayName,
@@ -134,10 +176,18 @@ async function saveCourt(court) {
     });
     savedCourtMapping[court.id] = newCourtId;
   } catch (error) {
+    // TODO: Update this to show user an error message
     console.error("Error:", error);
   }
 }
 
+/**
+ * Removes a saved court from the server and updates local savedCourts data.
+ *
+ * @async
+ * @param {object} court - The court object representing the court to remove.
+ * @returns {Promise<void>}
+ */
 async function removeCourt(court) {
   const savedCourtId = savedCourtMapping[court.id];
   console.log("Removing court with data:", savedCourtId);
@@ -157,10 +207,20 @@ async function removeCourt(court) {
     );
     console.log("Server response:", response.data);
   } catch (error) {
+    // TODO: Update this to show user an error message
     console.error("Error:", error);
   }
 }
 
+/**
+ * Toggles the saved state of a court.
+ *
+ * Updates the UI and calls saveCourt or removeCourt based on the current state.
+ *
+ * @param {Event} event - The click event triggered on the save button.
+ * @param {object} court - The court object.
+ * @param {HTMLElement} infoWindowSave - The button element in the info window.
+ */
 function toggleCourtSave(event, court, infoWindowSave) {
   event.preventDefault();
 
@@ -181,17 +241,114 @@ function toggleCourtSave(event, court, infoWindowSave) {
   }, 250);
 }
 
+/**
+ * Creates and displays an info window for a marker. Adds click event to infoWindowSave button. 
+ *
+ * @param {object} court - The court object containing display information.
+ * @param {object} marker - The marker on which to display the info window.
+ */
+function createMarkerInfoWindow(court, marker) {
+  const infoWindowContent = document.createElement("div");
+  infoWindowContent.classList.add("info-window");
+
+  const infoWindowAddress = document.createElement("p");
+  infoWindowAddress.classList.add("info-window-address");
+  infoWindowAddress.textContent = court.formattedAddress;
+
+  const infoWindowMapsLink = document.createElement("a");
+  infoWindowMapsLink.href = court.googleMapsURI;
+  infoWindowMapsLink.target = "_blank";
+  infoWindowMapsLink.textContent = "View on Google Maps";
+  infoWindowMapsLink.classList.add("info-window-maps-link");
+
+  const infoWindowSave = document.createElement("button");
+  infoWindowSave.setAttribute("type", "button");
+  infoWindowSave.ariaLabel = "Save Court";
+  infoWindowSave.classList.add("info-window-save-btn");
+
+  const isSaved = savedCourts.some(
+    (savedCourt) => savedCourt.google_maps_place_id === court.id
+  );
+  if (isSaved) {
+    infoWindowSave.innerHTML = "<i class='fa-solid fa-heart'></i>";
+  } else {
+    infoWindowSave.innerHTML = "<i class='fa-regular fa-heart'></i>";
+  }
+
+  infoWindowSave.addEventListener("click", (event) =>
+    toggleCourtSave(event, court, infoWindowSave)
+  );
+
+  infoWindowContent.append(
+    infoWindowAddress,
+    infoWindowMapsLink,
+    infoWindowSave
+  );
+  infoWindow.close();
+
+  const headerDiv = document.createElement("div");
+  headerDiv.classList.add("info-window-header", "text-center");
+  headerDiv.innerText = court.displayName;
+
+  infoWindow.setHeaderContent(headerDiv);
+  infoWindow.setContent(infoWindowContent);
+  infoWindow.open(marker.map, marker);
+}
+
+/**
+ * Creates a custom pin element for markers.
+ *
+ * @param {Function} PinElement - The google maps constructor for creating a pin element.
+ * @returns {object} The created pin element.
+ */
+function createPinElement(PinElement) {
+  const pin = new PinElement({
+    glyph: "🏀",
+    background: "white",
+    borderColor: "black",
+    scale: 1.5,
+  });
+  return pin;
+}
+
+/**
+ * Creates a marker element for a given court.
+ *
+ * @param {object} court - The court object with location and display details.
+ * @param {number} index - The index of the court in the results.
+ * @param {Function} AdvancedMarkerElement - The google maps constructor for creating an advanced marker element.
+ * @param {object} pin - The pin element to use as the marker's content.
+ * @returns {object} - The created marker element.
+ */
+function createMarkerElement(court, index, AdvancedMarkerElement, pin) {
+  const marker = new AdvancedMarkerElement({
+    map,
+    position: court.location,
+    title: `${index + 1}. ${court.displayName}`,
+    content: pin.element,
+    gmpClickable: true,
+  });
+  return marker;
+}
+
+/**
+ * Searches for basketball courts near a given location, creates markers for each result,
+ * and adjusts the map view.
+ *
+ * @async
+ * @param {object} searchPlace - The location to search around.
+ * @returns {Promise<number|undefined>} A promise that resolves to the number of courts found,
+ *                                      or undefined if no results.
+ */
 async function findCourts(searchPlace) {
   // Empty markers from previous search;
   clearMarkers();
 
-  // Request needed libraries.
   const { Place } = await google.maps.importLibrary("places");
   const { AdvancedMarkerElement, PinElement } = await google.maps.importLibrary(
     "marker"
   );
 
-  // Set the request parameters.
   const requestCourts = {
     textQuery: "Basketball Court",
     fields: ["displayName", "location", "formattedAddress", "googleMapsURI"],
@@ -209,80 +366,26 @@ async function findCourts(searchPlace) {
     const { LatLngBounds } = await google.maps.importLibrary("core");
     const bounds = new LatLngBounds();
 
-    // Loop through and get all results, with custom markers.
-    places.forEach((court, i) => {
-      // Custom pin, with basketball emoji.
-      const pin = new PinElement({
-        glyph: "🏀",
-        background: "white",
-        borderColor: "black",
-        scale: 1.5,
-      });
-      const marker = new AdvancedMarkerElement({
-        map,
-        position: court.location,
-        title: `${i + 1}. ${court.displayName}`,
-        content: pin.element,
-        gmpClickable: true,
-      });
+    places.forEach((court, index) => {
+      const pin = createPinElement(PinElement);
+      const marker = createMarkerElement(
+        court,
+        index,
+        AdvancedMarkerElement,
+        pin
+      );
 
       bounds.extend(court.location);
 
-      // Add a click listener for each marker, and set up the info window.
-      marker.addListener("click", ({ domEvent, latLng }) => {
-        const { target } = domEvent;
-
-        const infoWindowContent = document.createElement("div");
-        infoWindowContent.classList.add("info-window");
-
-        const infoWindowAddress = document.createElement("p");
-        infoWindowAddress.classList.add("info-window-address");
-        infoWindowAddress.textContent = court.formattedAddress;
-
-        const infoWindowMapsLink = document.createElement("a");
-        infoWindowMapsLink.href = court.googleMapsURI;
-        infoWindowMapsLink.target = "_blank";
-        infoWindowMapsLink.textContent = "View on Google Maps";
-        infoWindowMapsLink.classList.add("info-window-maps-link");
-
-        const infoWindowSave = document.createElement("button");
-        infoWindowSave.setAttribute("type", "button");
-        infoWindowSave.ariaLabel = "Save Court";
-        infoWindowSave.classList.add("info-window-save-btn");
-
-        const isSaved = savedCourts.some(
-          (savedCourt) => savedCourt.google_maps_place_id === court.id
-        );
-        if (isSaved) {
-          infoWindowSave.innerHTML = "<i class='fa-solid fa-heart'></i>";
-        } else {
-          infoWindowSave.innerHTML = "<i class='fa-regular fa-heart'></i>";
-        }
-
-        infoWindowSave.addEventListener("click", (event) =>
-          toggleCourtSave(event, court, infoWindowSave)
-        );
-
-        infoWindowContent.append(
-          infoWindowAddress,
-          infoWindowMapsLink,
-          infoWindowSave
-        );
-        infoWindow.close();
-
-        const headerDiv = document.createElement("div");
-        headerDiv.classList.add("info-window-header", "text-center");
-        headerDiv.innerText = court.displayName;
-
-        infoWindow.setHeaderContent(headerDiv);
-        infoWindow.setContent(infoWindowContent);
-        infoWindow.open(marker.map, marker);
+      marker.addListener("click", () => {
+        createMarkerInfoWindow(court, marker);
       });
       markers.push(marker);
     });
     map.fitBounds(bounds);
     return places.length;
   } else {
+   // TODO: Update this to show user a message
     console.log("No Results");
   }
 }

@@ -11,6 +11,7 @@ async function removeCourt(courtId) {
     });
     console.log("Server response:", response.data);
   } catch (error) {
+    // TODO: Update this to show user an error message 
     console.error("Error:", error);
   }
 }
@@ -25,6 +26,7 @@ for (const btn of removeButtons) {
       await removeCourt(courtId);
       courtContainer.remove();
     } catch (error) {
+      // TODO: Update this to show user an error message
       console.error("Error deleting court:", error);
     }
   });
@@ -44,6 +46,7 @@ async function updateCourtRating(courtId, rating) {
     });
     console.log("Rating update response:", response.data);
   } catch (error) {
+    // TODO: Update this to show user an error message
     console.error("Error updating rating:", error);
   }
 }

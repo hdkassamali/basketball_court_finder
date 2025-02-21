@@ -1,4 +1,10 @@
-async function removeCourt(courtId) {
+/**
+ * Async function called by removeCourtUi function. Takes in a courtId and makes a Flask API request to remove the court from the database.
+ * 
+ * @param {number} courtId - the id of the court to remove from the database.
+ * @returns {Promise<void>}
+ */
+async function removeCourtData(courtId) {
   const data = {
     court_id: courtId,
   };
@@ -11,27 +17,18 @@ async function removeCourt(courtId) {
     });
     console.log("Server response:", response.data);
   } catch (error) {
-    // TODO: Update this to show user an error message 
+    // TODO: Update this to show user an error message
     console.error("Error:", error);
   }
 }
 
-const removeButtons = document.querySelectorAll(".remove-court-btn");
-for (const btn of removeButtons) {
-  btn.addEventListener("click", async (event) => {
-    event.preventDefault();
-    const courtContainer = btn.closest(".court-container");
-    const courtId = courtContainer.dataset.courtId;
-    try {
-      await removeCourt(courtId);
-      courtContainer.remove();
-    } catch (error) {
-      // TODO: Update this to show user an error message
-      console.error("Error deleting court:", error);
-    }
-  });
-}
-
+/**
+ * Runs when a star rating is clicked. Takes in a courtId and rating and makes a Flask API request to update the court's rating in the database.
+ *
+ * @param {number} courtId - the id of the court to update the rating in the database.
+ * @param {number} rating - the rating the user selected to add to the court.
+ * @returns {Promise<void>}
+ */
 async function updateCourtRating(courtId, rating) {
   const data = {
     court_id: courtId,
@@ -51,6 +48,12 @@ async function updateCourtRating(courtId, rating) {
   }
 }
 
+/**
+ * Updates the star rating UI for a given court container based on the clicked star.
+ * 
+ * @param {HTMLElement} star - The star element that was clicked.
+ * @returns {{courtId: string, rating: number}} An object containing the courtId and the parsed rating.
+ */
 function updateStarUi(star) {
   const rating = parseInt(star.dataset.starValue, 10);
 
@@ -69,6 +72,33 @@ function updateStarUi(star) {
     }
   });
   return { courtId, rating };
+}
+
+/**
+ * Async function that runs when the remove button is clicked. Removes the Court container from the UI and calls removeCourtData function.
+ * 
+ * @param {Event} event - The click event triggered on the remove button.
+ * @param {HTMLElement} removeButton - The trash button in the court container.
+ * @returns {Promise<void>}
+ */
+async function removeCourtUi(event, removeButton) {
+  event.preventDefault();
+  const courtContainer = removeButton.closest(".court-container");
+  const courtId = courtContainer.dataset.courtId;
+  try {
+    await removeCourtData(courtId);
+    courtContainer.remove();
+  } catch (error) {
+    // TODO: Update this to show user an error message
+    console.error("Error deleting court:", error);
+  }
+}
+
+const removeButtons = document.querySelectorAll(".remove-court-btn");
+for (const removeButton of removeButtons) {
+  removeButton.addEventListener("click", async (event) => {
+    removeCourtUi(event, removeButton);
+  });
 }
 
 const starButtons = document.querySelectorAll(".court-rating-icon");

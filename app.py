@@ -49,39 +49,43 @@ def do_logout():
         del session[CURR_USER_KEY]
 
 
-def login_required(f):
+def login_required(wrapped_function):
     """Decorator to ensure a user is logged in before accesing a route."""
 
-    @wraps(f)
+    @wraps(wrapped_function)
     def decorated_function(*args, **kwargs):
         if not g.user:
             flash("Please login first!", "danger")
             return redirect("/login")
-        return f(*args, **kwargs)
+        return wrapped_function(*args, **kwargs)
 
     return decorated_function
 
 
-def cannot_be_logged_in(f):
+def cannot_be_logged_in(wrapped_function):
     """Decorator to ensure a logged in user cannot see register/login routes."""
 
-    @wraps(f)
+    @wraps(wrapped_function)
     def decorated_function(*args, **kwargs):
         if g.user:
             flash("You are already logged in", "warning")
             return redirect(f"/users/{g.user.username}/user_profile")
-        return f(*args, **kwargs)
+        return wrapped_function(*args, **kwargs)
 
     return decorated_function
 
 
-def check_user_authorized(username):
-    """Redirects the user to their own profile page if they attempt to access another user's profile page."""
+def user_authorized(wrapped_function):
+    """Decorator that Redirects the user to their own profile page if they attempt to access another user's profile page."""
 
-    if username != g.user.username:
-        flash("You are not authorized to access this page", "danger")
-        return redirect(f"/users/{g.user.username}/user_profile")
-    return None
+    @wraps(wrapped_function)
+    def decorated_function(username, *args, **kwargs):
+        if not g.user or g.user.username != username:
+            flash("You are not authorized to access this page", "danger")
+            return redirect(f"/users/{g.user.username}/user_profile" if g.user else "/")
+        return wrapped_function(username, *args, **kwargs)
+    
+    return decorated_function
 
 
 def handle_update_user_profile_form(user, form):
@@ -203,20 +207,18 @@ def logout():
 
 @app.route("/users/<username>/user_profile")
 @login_required
+@user_authorized
 def show_user_profile(username):
     """When a user is logged in, show the user's profile information.
     Checks if user is unauthorized. E.G. If they are trying to access another profile.
     """
-
-    unauthorized_redirect = check_user_authorized(username)
-    if unauthorized_redirect:
-        return unauthorized_redirect
-
+    
     return render_template("user_profile_page.html", user=g.user)
 
 
 @app.route("/users/<username>/edit_profile", methods=["GET", "POST"])
 @login_required
+@user_authorized
 def edit_user_profile(username):
     """
     Edit a user's proflle.
@@ -225,10 +227,6 @@ def edit_user_profile(username):
     GET: Pre-fills the Register form with existing user data.
     POST: Validates and updates the edited user data in the database.
     """
-
-    unauthorized_redirect = check_user_authorized(username)
-    if unauthorized_redirect:
-        return unauthorized_redirect
 
     form = EditForm()
 
@@ -280,12 +278,12 @@ def save_court():
         return jsonify(data_to_return), 201
     except Exception as e:
         db.session.rollback()
-        app.logger.error(f"Unexpected error: {e}")
         return jsonify({"error": "An unexpected error occured. Please try again"}), 500
 
 
 @app.route("/users/<username>/saved_courts")
 @login_required
+@user_authorized
 def view_saved_courts(username):
     """
     Allow a user to view their saved courts.
@@ -293,10 +291,6 @@ def view_saved_courts(username):
     This function checks if the user is authorized to access the saved courts for the specified username.
     It retrieves and displays only the set of courts for the current page (paginated), ensuring that only a subset of the user's saved courts are shown at a time.
     """
-
-    unauthorized_redirect = check_user_authorized(username)
-    if unauthorized_redirect:
-        return unauthorized_redirect
 
     page = request.args.get("page", 1, type=int)
     courts_paginated = (
@@ -332,7 +326,6 @@ def remove_saved_court():
         return jsonify({"message": "Court successfully deleted"}), 200
     except Exception as e:
         db.session.rollback()
-        app.logger.error(f"Unexpected error: {e}")
         return jsonify({"error": "An unexpected error occured. Please try again"}), 500
 
 
@@ -358,5 +351,4 @@ def update_court_rating():
         return jsonify({"message": "Rating updated successfully"}), 200
     except Exception as e:
         db.session.rollback()
-        app.logger.error(f"Unexpected error: {e}")
         return jsonify({"error": "An unexpected error occured. Please try again"}), 500

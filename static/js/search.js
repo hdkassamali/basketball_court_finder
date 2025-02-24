@@ -44,6 +44,7 @@ async function initMap() {
   infoWindow = new InfoWindow();
   initSearchBar();
 }
+
 /**
  * Displayes a feedback message to user within the specified search area.
  *

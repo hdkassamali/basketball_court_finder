@@ -11,7 +11,7 @@ if (disclaimerLink) {
   });
 }
 
-// Initialize and add the map
+// Initialize global variables and saved court mapping.
 let map;
 let infoWindow;
 let markers = [];
@@ -139,8 +139,7 @@ function clearMarkers() {
       if (marker.setMap) marker.setMap(null);
       if (marker.unbindAll) marker.unbindAll();
     } catch (e) {
-    // TODO: Update this to show user an error message
-      console.warn("Error removing marker:", e);
+      showError("Error removing marker!");
     }
   });
   markers = [];
@@ -167,7 +166,6 @@ async function saveCourt(court) {
         "Content-Type": "application/json",
       },
     });
-    console.log("Server response:", response.data);
 
     const newCourtId = response.data.id;
     savedCourts.push({
@@ -175,9 +173,8 @@ async function saveCourt(court) {
       id: newCourtId,
     });
     savedCourtMapping[court.id] = newCourtId;
-  } catch (error) {
-    // TODO: Update this to show user an error message
-    console.error("Error:", error);
+  } catch (e) {
+    showError("An error occurred while saving the court. Please try again.")
   }
 }
 
@@ -190,7 +187,6 @@ async function saveCourt(court) {
  */
 async function removeCourt(court) {
   const savedCourtId = savedCourtMapping[court.id];
-  console.log("Removing court with data:", savedCourtId);
   const data = {
     court_id: savedCourtId,
   };
@@ -205,10 +201,8 @@ async function removeCourt(court) {
     savedCourts = savedCourts.filter(
       (sc) => sc.google_maps_place_id !== court.id
     );
-    console.log("Server response:", response.data);
-  } catch (error) {
-    // TODO: Update this to show user an error message
-    console.error("Error:", error);
+  } catch (e) {
+    showError("An error occurred while removing the court. Please try again.");
   }
 }
 
@@ -242,7 +236,7 @@ function toggleCourtSave(event, court, infoWindowSave) {
 }
 
 /**
- * Creates and displays an info window for a marker. Adds click event to infoWindowSave button. 
+ * Creates and displays an info window for a marker. Adds click event to infoWindowSave button.
  *
  * @param {object} court - The court object containing display information.
  * @param {object} marker - The marker on which to display the info window.
@@ -385,8 +379,7 @@ async function findCourts(searchPlace) {
     map.fitBounds(bounds);
     return places.length;
   } else {
-   // TODO: Update this to show user a message
-    console.log("No Results");
+    showError("No results! Please try again.", "warning");
   }
 }
 

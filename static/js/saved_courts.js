@@ -1,6 +1,6 @@
 /**
  * Async function called by removeCourtUi function. Takes in a courtId and makes a Flask API request to remove the court from the database.
- * 
+ *
  * @param {number} courtId - the id of the court to remove from the database.
  * @returns {Promise<void>}
  */
@@ -15,10 +15,8 @@ async function removeCourtData(courtId) {
         "Content-Type": "application/json",
       },
     });
-    console.log("Server response:", response.data);
-  } catch (error) {
-    // TODO: Update this to show user an error message
-    console.error("Error:", error);
+  } catch (e) {
+    showError("Error removing court. Please try again!");
   }
 }
 
@@ -41,16 +39,14 @@ async function updateCourtRating(courtId, rating) {
         "Content-Type": "application/json",
       },
     });
-    console.log("Rating update response:", response.data);
-  } catch (error) {
-    // TODO: Update this to show user an error message
-    console.error("Error updating rating:", error);
+  } catch (e) {
+    showError("Error updating rating. Please try again!");
   }
 }
 
 /**
  * Updates the star rating UI for a given court container based on the clicked star.
- * 
+ *
  * @param {HTMLElement} star - The star element that was clicked.
  * @returns {{courtId: string, rating: number}} An object containing the courtId and the parsed rating.
  */
@@ -76,7 +72,7 @@ function updateStarUi(star) {
 
 /**
  * Async function that runs when the remove button is clicked. Removes the Court container from the UI and calls removeCourtData function.
- * 
+ *
  * @param {Event} event - The click event triggered on the remove button.
  * @param {HTMLElement} removeButton - The trash button in the court container.
  * @returns {Promise<void>}
@@ -88,9 +84,8 @@ async function removeCourtUi(event, removeButton) {
   try {
     await removeCourtData(courtId);
     courtContainer.remove();
-  } catch (error) {
-    // TODO: Update this to show user an error message
-    console.error("Error deleting court:", error);
+  } catch (e) {
+    showError("Error deleting court! Please try again");
   }
 }
 

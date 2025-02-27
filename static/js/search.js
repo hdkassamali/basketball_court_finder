@@ -33,16 +33,24 @@ savedCourts.forEach((sc) => {
 async function initMap() {
   const center = { lat: 39.8283, lng: -98.5795 };
 
-  const { Map, InfoWindow } = await google.maps.importLibrary("maps");
-  map = new Map(document.getElementById("map"), {
-    zoom: 4,
-    center,
-    mapId: "c2c7ec2d8b2c125e",
-    mapTypeId: "hybrid",
-  });
+  try {
+    const { Map, InfoWindow } = await google.maps.importLibrary("maps");
+    map = new Map(document.getElementById("map"), {
+      zoom: 4,
+      center,
+      mapId: "c2c7ec2d8b2c125e",
+      mapTypeId: "hybrid",
+    });
 
-  infoWindow = new InfoWindow();
-  initSearchBar();
+    infoWindow = new InfoWindow();
+    initSearchBar();
+  } catch (error) {
+    showError(
+      "Daily request limit for Google Maps API reached. Sorry for the inconvenience! Please try again tomorrow. (READ THE DISCLAIMER AT THE BOTTOM).",
+      "warning",
+      7000
+    );
+  }
 }
 
 /**
@@ -51,8 +59,9 @@ async function initMap() {
  * @param {HTMLElement} searchArea - The container element where the feedback should be displayed.
  * @param {string} message - The feedback message to display
  * @param {string} [type="error"] - The type of message (e.g., "error" or "info") that influences styling.
+ * @param {number} [delay="3000"] - The length of time a message stays on the screen.
  */
-function displaySearchFeedback(searchArea, message, type = "error") {
+function displaySearchFeedback(searchArea, message, type = "error", delay = 3000) {
   let existingMessage = document.getElementById("feedback-message");
   if (existingMessage) {
     existingMessage.remove();
@@ -68,7 +77,7 @@ function displaySearchFeedback(searchArea, message, type = "error") {
   if (type !== "info") {
     setTimeout(() => {
       messageElement.remove();
-    }, 3000);
+    }, delay);
   }
 }
 
@@ -104,6 +113,13 @@ async function performSearch(Geocoder, searchArea, searchInput) {
       displaySearchFeedback(
         searchArea,
         "No results found. Please check the address and try again."
+      );
+    } else if (status === "OVER_QUERY_LIMIT") {
+      displaySearchFeedback(
+        searchArea,
+        "Daily request limit for Google Maps API reached. Sorry for the inconvenience! Please try again tomorrow. (READ THE DISCLAIMER AT THE BOTTOM).",
+        "error",
+        7000
       );
     } else {
       displaySearchFeedback(
@@ -175,7 +191,7 @@ async function saveCourt(court) {
     });
     savedCourtMapping[court.id] = newCourtId;
   } catch (e) {
-    showError("An error occurred while saving the court. Please try again.")
+    showError("An error occurred while saving the court. Please try again.");
   }
 }
 
@@ -355,24 +371,39 @@ async function findCourts(searchPlace) {
     useStrictTypeFiltering: false,
   };
 
-  const { places } = await Place.searchByText(requestCourts);
+  let places;
+  try {
+    const result = await Place.searchByText(requestCourts);
+    places = result.places;
+  } catch (error) {
+    const errorStr = error.toString();
+    if (errorStr.includes("RESOURCE_EXHAUSTED")) {
+      showError(
+        "The daily request limit for Google Maps API may have been reached. Sorry for the inconvenience! Please try again tomorrow. (READ THE DISCLAIMER AT THE BOTTOM).",
+        "warning",
+        7000
+      );
+    } else {
+      showError(
+        "Something went wrong with the Google Maps API. Please try again!",
+        "warning",
+        7000
+      );
+    }
+    return;
+  }
 
-  if (places.length) {
+  if (places && places.length) {
     const { LatLngBounds } = await google.maps.importLibrary("core");
     const bounds = new LatLngBounds();
 
     places.forEach((court, index) => {
       const pin = createPinElement(PinElement);
-      const marker = createMarkerElement(
-        court,
-        index,
-        AdvancedMarkerElement,
-        pin
-      );
+      const marker = createMarkerElement(court, index, AdvancedMarkerElement, pin);
 
       bounds.extend(court.location);
 
-      marker.addListener("click", () => {
+      marker.addListener("gmp-click", () => {
         createMarkerInfoWindow(court, marker);
       });
       markers.push(marker);

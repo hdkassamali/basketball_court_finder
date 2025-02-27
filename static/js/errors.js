@@ -14,7 +14,7 @@ function fadeOutAlert(alertElement, delay = 3000) {
   }, delay);
 }
 
-function showError(message, type = "danger") {
+function showError(message, type = "danger", delay = 3000) {
   const container = document.getElementById("flash_container");
   if (!container) return;
 
@@ -24,7 +24,7 @@ function showError(message, type = "danger") {
   alertDiv.innerHTML = `${message}`;
   container.appendChild(alertDiv);
 
-  fadeOutAlert(alertDiv);
+  fadeOutAlert(alertDiv, delay);
 }
 
 document.addEventListener("DOMContentLoaded", function () {

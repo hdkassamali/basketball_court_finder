@@ -11,10 +11,12 @@ if (disclaimerLink) {
   });
 }
 
-// Initialize global variables and saved court mapping.
+// Initialize global variables and get data for saved court mapping.
 let map;
 let infoWindow;
 let markers = [];
+const courtDataEl = document.getElementById("court_data");
+let savedCourts = JSON.parse(courtDataEl.dataset.courts);
 const savedCourtMapping = {};
 savedCourts.forEach((sc) => {
   savedCourtMapping[sc.google_maps_place_id] = sc.id;
@@ -61,7 +63,12 @@ async function initMap() {
  * @param {string} [type="error"] - The type of message (e.g., "error" or "info") that influences styling.
  * @param {number} [delay="3000"] - The length of time a message stays on the screen.
  */
-function displaySearchFeedback(searchArea, message, type = "error", delay = 3000) {
+function displaySearchFeedback(
+  searchArea,
+  message,
+  type = "error",
+  delay = 3000
+) {
   let existingMessage = document.getElementById("feedback-message");
   if (existingMessage) {
     existingMessage.remove();
@@ -399,7 +406,12 @@ async function findCourts(searchPlace) {
 
     places.forEach((court, index) => {
       const pin = createPinElement(PinElement);
-      const marker = createMarkerElement(court, index, AdvancedMarkerElement, pin);
+      const marker = createMarkerElement(
+        court,
+        index,
+        AdvancedMarkerElement,
+        pin
+      );
 
       bounds.extend(court.location);
 

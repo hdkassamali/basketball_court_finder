@@ -94,12 +94,6 @@ class Court(db.Model):
         }
 
 
-# When working in ipython, running seed file, or when using unittest framework use this connect_db function otherwise use the one below:
-# def connect_db(app):
-#     db.app = app
-#     db.init_app(app)
-
-
 def connect_db(app):
     with app.app_context():
         db.app = app

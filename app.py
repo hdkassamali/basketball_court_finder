@@ -6,6 +6,7 @@ from functools import wraps
 from sqlalchemy.exc import IntegrityError
 import os
 from dotenv import load_dotenv
+
 load_dotenv()
 
 app = Flask(__name__)
@@ -17,9 +18,6 @@ app.config["DEBUG_TB_INTERCEPT_REDIRECTS"] = False
 toolbar = DebugToolbarExtension(app)
 
 api_key = os.getenv("GOOGLE_MAPS_API_KEY")
-
-# When working in ipython, running seed file, or when using unittest framework run the line below:
-# app.app_context().push()
 
 connect_db(app)
 
@@ -84,7 +82,7 @@ def user_authorized(wrapped_function):
             flash("You are not authorized to access this page", "danger")
             return redirect(f"/users/{g.user.username}/user_profile" if g.user else "/")
         return wrapped_function(username, *args, **kwargs)
-    
+
     return decorated_function
 
 
@@ -212,7 +210,7 @@ def show_user_profile(username):
     """When a user is logged in, show the user's profile information.
     Checks if user is unauthorized. E.G. If they are trying to access another profile.
     """
-    
+
     return render_template("user_profile_page.html", user=g.user)
 
 
@@ -294,8 +292,7 @@ def view_saved_courts(username):
 
     page = request.args.get("page", 1, type=int)
     courts_paginated = (
-        Court.query
-        .filter_by(user_id=g.user.id)
+        Court.query.filter_by(user_id=g.user.id)
         .order_by(Court.id.desc())
         .paginate(page=page, per_page=15)
     )
@@ -306,7 +303,7 @@ def view_saved_courts(username):
 @app.route("/remove_court", methods=["POST"])
 @login_required
 def remove_saved_court():
-    """Remove's a saved court from the saved_courts page and from the database."""
+    """Removes a saved court from the saved_courts page and from the database."""
 
     data = request.get_json()
     if not data:
@@ -320,7 +317,7 @@ def remove_saved_court():
 
         if court.user_id != g.user.id:
             return jsonify({"error": "Unauthorized action"}), 403
-        # Court.query.filter_by(id=court_id).delete()
+
         db.session.delete(court)
         db.session.commit()
         return jsonify({"message": "Court successfully deleted"}), 200
@@ -341,7 +338,7 @@ def update_court_rating():
     court = Court.query.get(court_id)
     if not court:
         return jsonify({"error": "Court not found"}), 404
-    
+
     if court.user_id != g.user.id:
         return jsonify({"error": "Unauthorized action"}), 403
 
